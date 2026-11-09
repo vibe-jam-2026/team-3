@@ -119,10 +119,13 @@ export function updateGame(game, dt) {
 
   // --- Spawning ---
   const cursed = game.wave === game.cursedWave;
+  // Fewer regular enemies while the boss is around
+  const bossAlive = game.enemies.some((e) => e.boss);
+  const rate = WAVES.spawnRate * (bossAlive ? BOSS.enemySpawnRate : 1);
   game.spawnTimer -= dt;
   while (game.spawnTimer <= 0) {
     if (!cursed || game.enemies.length < CURSE.maxEnemies) spawnEnemy(game);
-    game.spawnTimer += cursed ? CURSE.spawnInterval : spawnInterval(game.wave);
+    game.spawnTimer += cursed ? CURSE.spawnInterval : spawnInterval(game.wave) / rate;
   }
 
   // Boss wave: the dinosaur roars in a few seconds after the wave starts
