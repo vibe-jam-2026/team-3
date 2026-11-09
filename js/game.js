@@ -6,6 +6,7 @@ import { moveVector } from './input.js';
 import { PLAYER, CHAIN, WAVES, DEBUG } from './config.js';
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
+import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
 
 export const PLAYER_COLORS = ['#4fc3f7', '#ffb74d'];
 
@@ -28,7 +29,7 @@ export function createGame(width, height) {
     players,
     chain: createChain(players[0], players[1]),
     enemies: [],
-    particles: [],
+    effects: [],    // cracked shells, yolk splats
   };
   return game;
 }
@@ -111,6 +112,7 @@ export function updateGame(game, dt) {
     e.hp -= CHAIN.oneHitKill ? e.hp : speed * CHAIN.damagePerSpeed;
     e.hitCooldown = CHAIN.hitCooldown;
     e.flash = 0.08;
+    e.lastHitVx = vx; e.lastHitVy = vy;
     e.vx += vx * CHAIN.knockback;
     e.vy += vy * CHAIN.knockback;
   });
@@ -139,12 +141,12 @@ export function updateGame(game, dt) {
       e.dead = true;
       game.kills += 1;
       game.waveKills += 1;
-      burst(game, e.x, e.y, '#e5534b');
+      crackEgg(game.effects, e, e.lastHitVx, e.lastHitVy);
     }
   }
   game.enemies = game.enemies.filter((e) => !e.dead);
 
-  updateParticles(game, dt);
+  game.effects = updateEffects(game.effects, dt);
 
   // --- Win / lose ---
   if (game.players.some((p) => p.hp <= 0)) {
@@ -159,24 +161,6 @@ function clampToArena(game, p) {
   p.y = Math.max(p.r, Math.min(game.height - p.r, p.y));
 }
 
-// ---------- Particles (tiny bit of juice for kills) ----------
-function burst(game, x, y, color) {
-  for (let i = 0; i < 10; i++) {
-    const ang = Math.random() * Math.PI * 2;
-    const spd = 60 + Math.random() * 160;
-    game.particles.push({ x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 0.4, color });
-  }
-}
-
-function updateParticles(game, dt) {
-  for (const p of game.particles) {
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    p.life -= dt;
-  }
-  game.particles = game.particles.filter((p) => p.life > 0);
-}
-
 // ---------- Drawing ----------
 export function drawGame(ctx, game) {
   // Arena
@@ -186,15 +170,10 @@ export function drawGame(ctx, game) {
   ctx.lineWidth = 4;
   ctx.strokeRect(2, 2, game.width - 4, game.height - 4);
 
+  drawFloorEffects(ctx, game.effects);
   drawEnemies(ctx, game.enemies);
   drawChain(ctx, game.chain);
-
-  for (const p of game.particles) {
-    ctx.globalAlpha = Math.max(0, p.life / 0.4);
-    ctx.fillStyle = p.color;
-    ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
-  }
-  ctx.globalAlpha = 1;
+  drawAirEffects(ctx, game.effects);
 
   for (const p of game.players) drawPlayer(ctx, p);
 
