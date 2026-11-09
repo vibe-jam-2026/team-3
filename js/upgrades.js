@@ -3,39 +3,39 @@
 
 import { PLAYER, CHAIN, COINS } from './config.js';
 
-// Tune here. cost = baseCost + costStep * currentLevel  (1, 2, 3, 4, 5, ...)
+// Tune here. Costs follow a Fibonacci sequence from firstCosts: 3, 5, 8, 13, 21, 34, ...
 // maxLevel: Infinity = no cap (set a number to cap an upgrade)
 export const UPGRADES = [
   {
     id: 'chain', name: 'Chain length', icon: '⛓',
     desc: (lvl) => `+${30} px chain (now ${Math.round(CHAIN.maxLength + 30 * lvl)} px)`,
-    baseCost: 1, costStep: 1, maxLevel: Infinity,
+    firstCosts: [3, 5], maxLevel: Infinity,
   },
   {
     id: 'hp', name: 'Max health', icon: '❤',
     desc: (lvl) => `+25 max hp each (now ${PLAYER.maxHp + 25 * lvl})`,
-    baseCost: 1, costStep: 1, maxLevel: Infinity,
+    firstCosts: [3, 5], maxLevel: Infinity,
   },
   {
     id: 'regen', name: 'Health regen', icon: '✚',
     desc: (lvl) => `+1 hp/s each (now ${lvl} hp/s)`,
-    baseCost: 1, costStep: 1, maxLevel: Infinity,
+    firstCosts: [3, 5], maxLevel: Infinity,
   },
   {
     id: 'speed', name: 'Move speed', icon: '➤',
     desc: (lvl) => `+8% speed (now +${8 * lvl}%)`,
-    baseCost: 1, costStep: 1, maxLevel: Infinity,
+    firstCosts: [3, 5], maxLevel: Infinity,
   },
   {
     id: 'slow', name: 'Enemy slow', icon: '❄',
     // Multiplies, so it never reaches 0: each level makes enemies 7% slower than before
     desc: (lvl) => `Enemies 7% slower (now −${Math.round((1 - 0.93 ** lvl) * 100)}%)`,
-    baseCost: 1, costStep: 1, maxLevel: Infinity,
+    firstCosts: [3, 5], maxLevel: Infinity,
   },
   {
     id: 'magnet', name: 'Coin magnet', icon: '🧲',
     desc: (lvl) => `+35 px pickup field (now ${COINS.magnetRadius + 35 * lvl} px)`,
-    baseCost: 1, costStep: 1, maxLevel: Infinity,
+    firstCosts: [3, 5], maxLevel: Infinity,
   },
 ];
 
@@ -43,8 +43,11 @@ export function createUpgradeLevels() {
   return Object.fromEntries(UPGRADES.map((u) => [u.id, 0]));
 }
 
+/** Fibonacci: each price is the sum of the two before it (3, 5, 8, 13, 21, ...). */
 export function upgradeCost(u, level) {
-  return u.baseCost + u.costStep * level;
+  let [a, b] = u.firstCosts;
+  for (let i = 0; i < level; i++) [a, b] = [b, a + b];
+  return a;
 }
 
 /** Turn upgrade levels into the numbers the game uses. */
