@@ -1,11 +1,28 @@
-// Enemies: rolling eggs that spawn at the arena edge and chase the nearest player.
+// Enemies: eggs (tier 1), chickens (tier 2) and roosters (tier 3).
+// They spawn at the arena edge and chase the nearest player.
 
-import { ENEMY } from './config.js';
+import { ENEMY, ENEMY_TYPES, TIER_SPAWNS } from './config.js';
 import { drawEgg, makeSpeckles } from './egg.js';
+import { drawChicken } from './chicken.js';
+
+/** Pick which kind of enemy to spawn this wave. */
+function pickType(wave) {
+  let roll = Math.random();
+  for (const type of ['rooster', 'chicken']) {
+    const t = TIER_SPAWNS[type];
+    if (wave < t.fromWave) continue;
+    const chance = Math.min(t.max, t.perWave * (wave - t.fromWave + 1));
+    if (roll < chance) return type;
+    roll -= chance;
+  }
+  return 'egg';
+}
 
 export function spawnEnemy(game) {
   const { width, height, wave } = game;
-  const r = ENEMY.radius;
+  const type = pickType(wave);
+  const def = ENEMY_TYPES[type];
+  const r = def.radius;
   // Pick a random point on the arena edge, just inside it
   const side = Math.floor(Math.random() * 4);
   let x, y;
@@ -14,17 +31,21 @@ export function spawnEnemy(game) {
   else if (side === 2) { x = Math.random() * width; y = height - r; }
   else { x = r; y = Math.random() * height; }
 
-  const hp = ENEMY.baseHp + ENEMY.hpPerWave * (wave - 1);
+  const hp = def.hp + ENEMY.hpPerWave * (wave - 1);
   game.enemies.push({
+    type, tier: def.tier,
     x, y, r,
+    damage: def.damage,
     vx: 0, vy: 0,          // knockback velocity
     hp, maxHp: hp,
-    speed: ENEMY.baseSpeed + ENEMY.speedPerWave * (wave - 1),
+    speed: (ENEMY.baseSpeed + ENEMY.speedPerWave * (wave - 1)) * def.speed,
     hitCooldown: 0,
     flash: 0,
     spawnAnim: 0.4,        // fade-in; harmless while spawning
     roll: Math.random() * Math.PI * 2, // current rotation as it rolls
     speckles: makeSpeckles(),
+    facing: Math.random() < 0.5 ? -1 : 1, // chickens look left or right
+    walk: Math.random() * 10,             // walk-cycle phase
     dead: false,
   });
 }
@@ -85,6 +106,8 @@ export function updateEnemies(game, dt) {
     const dist = Math.hypot(dx, dy);
     const dirSign = dx + dy * 0.3 >= 0 ? 1 : -1;
     e.roll += (dist / e.r) * dirSign;
+    e.walk += dist / e.r;
+    if (Math.abs(dx) > 0.15) e.facing = dx > 0 ? 1 : -1;
   }
 }
 
@@ -102,7 +125,9 @@ export function drawEnemies(ctx, enemies) {
   for (const e of enemies) {
     const appear = 1 - e.spawnAnim / 0.4;           // 0 -> 1 while spawning
     ctx.globalAlpha = 0.3 + 0.7 * appear;
-    drawEgg(ctx, e.x, e.y, e.r, e.roll, e.speckles, e.flash > 0, 0.5 + 0.5 * appear);
+    const scale = 0.5 + 0.5 * appear;
+    if (e.type === 'egg') drawEgg(ctx, e.x, e.y, e.r, e.roll, e.speckles, e.flash > 0, scale);
+    else drawChicken(ctx, e, e.type === 'rooster', scale);
     ctx.globalAlpha = 1;
 
     // Health bar once damaged (for future weapons that don't one-hit)

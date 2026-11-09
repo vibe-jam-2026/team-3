@@ -4,7 +4,6 @@ export const PLAYER = {
   radius: 16,
   speed: 260,          // px per second
   maxHp: 100,
-  hitDamage: 10,       // damage from one enemy touch
   invulnTime: 0.6,     // seconds of invulnerability after being hit
 };
 
@@ -24,12 +23,25 @@ export const CHAIN = {
 };
 
 export const ENEMY = {
-  radius: 12,
-  baseHp: 25,
-  hpPerWave: 6,
+  hpPerWave: 6,        // extra hp per wave (all tiers)
   baseSpeed: 70,
   speedPerWave: 7,
   knockbackFriction: 6, // how quickly knockback wears off
+};
+
+// Enemy tiers. Bigger tiers are larger and hit harder; no special abilities yet.
+//   radius: size in px · hp: base hp · damage: hp taken by a player per touch
+//   speed: multiplier on ENEMY.baseSpeed
+export const ENEMY_TYPES = {
+  egg:     { tier: 1, radius: 12, hp: 25, damage: 10, speed: 1 },
+  chicken: { tier: 2, radius: 17, hp: 50, damage: 18, speed: 1 },
+  rooster: { tier: 3, radius: 22, hp: 90, damage: 28, speed: 1 },
+};
+
+// Which tiers spawn in which wave. Chance = perWave * (wave - fromWave + 1), capped at max.
+export const TIER_SPAWNS = {
+  chicken: { fromWave: 2, perWave: 0.15, max: 0.45 },
+  rooster: { fromWave: 3, perWave: 0.10, max: 0.30 },
 };
 
 export const WAVES = {
@@ -43,8 +55,10 @@ export const WAVES = {
 // Debug options from the URL, for testing:
 //   ?god          players can't take damage
 //   ?wave=5       waves last 5 seconds instead of WAVES.duration
+//   ?start=4      begin at wave 4 (to test later waves and enemy tiers)
 const params = new URLSearchParams(window.location.search);
 export const DEBUG = {
   god: params.has('god'),
+  startWave: Math.max(1, Math.floor(Number(params.get('start')) || 1)),
 };
 if (params.has('wave')) WAVES.duration = Number(params.get('wave')) || WAVES.duration;
