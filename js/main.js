@@ -7,6 +7,7 @@ import {
 import { drawBigBang, bigBangTime } from './bigbang.js';
 import { addScore, loadScores, bestScore, MAX_ENTRIES } from './highscores.js';
 import { DEBUG } from './config.js';
+import { VERSION } from './version.js';
 import { toggleMute, isMuted } from './audio.js';
 import { UPGRADES, upgradeCost, buyUpgrade } from './upgrades.js';
 
@@ -257,15 +258,23 @@ function draw() {
 
   if (screen === 'title') {
     drawTitle();
-    return;
+  } else {
+    drawGame(ctx, game);
+    if (screen === 'paused') {
+      drawOverlay('Paused', ['Press Esc or P to continue']);
+    }
+    // Game over text is in the HTML overlay (names + highscores)
   }
+  drawVersion();
+}
 
-  drawGame(ctx, game);
-
-  if (screen === 'paused') {
-    drawOverlay('Paused', ['Press Esc or P to continue']);
-  }
-  // Game over text is in the HTML overlay (names + highscores)
+/** Version number in the bottom-right corner of every screen. */
+function drawVersion() {
+  ctx.font = '600 12px system-ui, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  ctx.fillStyle = 'rgba(232, 230, 225, 0.55)';
+  ctx.fillText(`v${VERSION}`, width - 10, height - 8);
 }
 
 // ---------- Screens ----------

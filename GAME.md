@@ -10,6 +10,8 @@
 
 All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
+Current version: **1.00** (shown in the bottom-right corner of the game)
+
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
 ## Pitch
