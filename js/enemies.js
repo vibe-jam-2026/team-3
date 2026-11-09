@@ -4,6 +4,7 @@
 import { ENEMY, ENEMY_TYPES, TIER_SPAWNS } from './config.js';
 import { drawEgg, makeSpeckles } from './egg.js';
 import { drawChicken } from './chicken.js';
+import { playCluck, playCrow } from './audio.js';
 
 /** Pick which kind of enemy to spawn this wave. */
 function pickType(wave) {
@@ -48,6 +49,10 @@ export function spawnEnemy(game) {
     walk: Math.random() * 10,             // walk-cycle phase
     dead: false,
   });
+
+  // Announce the bigger enemies
+  if (type === 'chicken') playCluck();
+  else if (type === 'rooster') playCrow();
 }
 
 export function updateEnemies(game, dt) {
