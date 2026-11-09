@@ -16,8 +16,6 @@ export const CHAIN = {
   damping: 0.97,       // 1 = no friction, lower = chain settles faster
   thickness: 4,        // px, also the hit width
   minHitSpeed: 120,    // px/s a link must move to hurt an enemy
-  oneHitKill: true,    // chain kills any enemy in one hit, whatever its hp
-  damagePerSpeed: 0.06,// used when oneHitKill is false: damage = speed * this (400 px/s -> 24)
   hitCooldown: 0.25,   // seconds before the same enemy can be hit again
   knockback: 0.35,     // fraction of link velocity transferred to the enemy
 };
@@ -32,13 +30,13 @@ export const ENEMY = {
 
 // Enemy tiers. Bigger tiers are larger and hit harder; no special abilities yet.
 //   radius: size in px · hp: base hp · damage: hp taken by a player per touch
-//   speed: multiplier on ENEMY.baseSpeed
+//   speed: multiplier on ENEMY.baseSpeed · hits: chain hits needed to kill it
 export const ENEMY_TYPES = {
-  egg:     { tier: 1, radius: 12, hp: 25, damage: 10, speed: 1 },
-  chicken: { tier: 2, radius: 17, hp: 50, damage: 18, speed: 1 },
-  rooster: { tier: 3, radius: 22, hp: 90, damage: 28, speed: 1 },
+  egg:     { tier: 1, radius: 12, hp: 25, damage: 10, speed: 1, hits: 1 },
+  chicken: { tier: 2, radius: 17, hp: 50, damage: 18, speed: 1, hits: 2 },
+  rooster: { tier: 3, radius: 22, hp: 90, damage: 28, speed: 1, hits: 3 },
   // Neutral: never hurts players, hunts eggs instead (see RATS and rat.js)
-  rat:     { tier: 0, radius: 10, hp: 15, damage: 0, speed: 1, neutral: true },
+  rat:     { tier: 0, radius: 10, hp: 15, damage: 0, speed: 1, hits: 1, neutral: true },
 };
 
 // Rats spawn on their own timer, separate from the waves of hostile enemies.
@@ -67,9 +65,9 @@ export const WAVES = {
 // Boss: a big dinosaur every few waves (see boss.js)
 export const BOSS = {
   everyWaves: 5,     // waves 5, 10, 15, ...
-  spawnAt: 5,        // seconds into the wave
+  spawnAt: 25,       // seconds into the wave
   radius: 46,
-  hits: 20,          // chain hits needed to kill it
+  hits: 5,           // chain hits needed to kill it
   hitCooldown: 0.3,  // seconds between hits that count
   damage: 35,        // per touch (grows x1.05 per wave like other enemies)
   walkSpeed: 55,     // px/s while stomping toward the players
