@@ -41,6 +41,7 @@ export function spawnEnemy(game, forcedType = null) {
     damage: def.damage * ENEMY.damageGrowth ** (wave - 1),
     vx: 0, vy: 0,          // knockback velocity
     hp, maxHp: hp,
+    hitsLeft: def.hits ?? 1, maxHits: def.hits ?? 1, // chain hits needed to kill it
     speed: ENEMY.baseSpeed * ENEMY.speedGrowth ** (wave - 1) * def.speed,
     hitCooldown: 0,
     flash: 0,
@@ -154,13 +155,14 @@ export function drawEnemies(ctx, enemies) {
     else drawChicken(ctx, e, e.type === 'rooster', scale);
     ctx.globalAlpha = 1;
 
-    // Health bar once damaged (for future weapons that don't one-hit)
-    if (e.hp > 0 && e.hp < e.maxHp) {
+    // Hits-left bar once it has been hit (the boss has its own big bar)
+    if (!e.boss && e.hitsLeft > 0 && e.hitsLeft < e.maxHits) {
       const w = e.r * 2;
+      const y = e.y - e.r * 1.4 - 6;
       ctx.fillStyle = '#3a1d1d';
-      ctx.fillRect(e.x - e.r, e.y - e.r * 1.5 - 5, w, 3);
+      ctx.fillRect(e.x - e.r, y, w, 4);
       ctx.fillStyle = '#ff8a80';
-      ctx.fillRect(e.x - e.r, e.y - e.r * 1.5 - 5, w * (e.hp / e.maxHp), 3);
+      ctx.fillRect(e.x - e.r, y, w * (e.hitsLeft / e.maxHits), 4);
     }
   }
 }

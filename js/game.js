@@ -152,7 +152,10 @@ export function updateGame(game, dt) {
       else e.flash = 0.08;
       return;
     }
-    if (!e.invincible) e.hp -= CHAIN.oneHitKill ? e.hp : speed * CHAIN.damagePerSpeed;
+    if (!e.invincible) {
+      e.hitsLeft -= 1;
+      if (e.hitsLeft <= 0) e.hp = 0;
+    }
     e.hitCooldown = CHAIN.hitCooldown;
     e.flash = 0.08;
     e.lastHitVx = vx; e.lastHitVy = vy;
