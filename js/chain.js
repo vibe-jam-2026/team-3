@@ -119,7 +119,7 @@ export function chainHits(chain, enemies, dt, onHit) {
   }
 }
 
-function distToSegmentSq(px, py, ax, ay, bx, by) {
+export function distToSegmentSq(px, py, ax, ay, bx, by) {
   const abx = bx - ax;
   const aby = by - ay;
   const lenSq = abx * abx + aby * aby;

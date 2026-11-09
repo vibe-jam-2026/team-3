@@ -8,7 +8,7 @@ import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, d
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
 import { featherBurst } from './chicken.js';
-import { dropCoins, updateCoins, drawCoins, drawCoinIcon } from './coins.js';
+import { dropCoins, updateCoins, drawCoins, drawCoinIcon, drawMagnetFields } from './coins.js';
 import { createUpgradeLevels, applyStats } from './upgrades.js';
 
 export const PLAYER_COLORS = ['#4fc3f7', '#ffb74d'];
@@ -187,6 +187,7 @@ export function drawGame(ctx, game) {
   ctx.strokeRect(2, 2, game.width - 4, game.height - 4);
 
   drawFloorEffects(ctx, game.effects);
+  drawMagnetFields(ctx, game);
   drawCoins(ctx, game.floorCoins);
   drawEnemies(ctx, game.enemies);
   drawChain(ctx, game.chain);
