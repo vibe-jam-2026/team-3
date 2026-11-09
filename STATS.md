@@ -41,7 +41,7 @@ All base values in the game. The real numbers live in `js/config.js` (and upgrad
 | Speed (wave 1) | 56 px/s | 56 px/s | 56 px/s | 105 px/s (half when wandering) | 55 walking / 620 charging | 90 gliding |
 | Size (radius) | 12 px | 17 px | 22 px | 10 px | 46 px | 44 px |
 | Coins (base) | 1 | 3 | 6 | 1 | 25 | 25 |
-| Coins (on average, ×0.8) | 0.8 | 2.4 | 4.8 | 0.8 | 20 | 20 |
+| Coins in wave 1 (on average, ×0.8) | 0.8 | 2.4 | 4.8 | 0.8 | 20 | 20 |
 | First appears | wave 1 | wave 2 | wave 3 | wave 1 | waves 5, 15, 25, … | waves 10, 20, 30, … |
 
 - A hit is a chain swing **or a bounced alien shot** (bounced shots hurt every enemy and both bosses).
@@ -55,9 +55,10 @@ All base values in the game. The real numbers live in `js/config.js` (and upgrad
 | What | Rule |
 |---|---|
 | Wave length | 30 s (boss waves continue until the dino is dead) |
-| Time between spawns | 1.1 s in wave 1, ×0.91 each wave (9% shorter per wave), min 0.15 s; then ÷1.2 (20% more enemies) |
+| Time between spawns | 1.1 s in wave 1, ×0.955 each wave (4.5% shorter per wave), min 0.15 s; then ÷1.2 (20% more enemies) |
 | Enemy speed | ×1.05 per wave (not the dino) |
 | Enemy damage | ×1.05 per wave (dino too) |
+| Coin drops | ×1.2 per wave (all enemies and bosses) |
 | Chickens | 15% of spawns at wave 2, +15 points per wave, max 45% |
 | Roosters | 10% of spawns at wave 3, +10 points per wave, max 30% |
 | Rats | one every 6 s, max 4 alive; the first comes 2 s into the wave |
@@ -66,9 +67,10 @@ Spawn interval by wave (after the 20% boost):
 
 | Wave | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 |
 |---|---|---|---|---|---|---|---|---|
-| Seconds between spawns | 0.92 | 0.83 | 0.76 | 0.69 | 0.63 | 0.57 | 0.47 | 0.39 |
+| Seconds between spawns | 0.92 | 0.88 | 0.84 | 0.80 | 0.76 | 0.73 | 0.66 | 0.61 |
 | Enemy speed (px/s) | 56 | 59 | 62 | 65 | 68 | 71 | 79 | 87 |
 | Damage ×  | 1.00 | 1.05 | 1.10 | 1.16 | 1.22 | 1.28 | 1.41 | 1.55 |
+| Coins ×  | 1.00 | 1.20 | 1.44 | 1.73 | 2.07 | 2.49 | 3.58 | 5.16 |
 
 ## Rats
 

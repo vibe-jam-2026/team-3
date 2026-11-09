@@ -57,7 +57,7 @@ export const TIER_SPAWNS = {
 export const WAVES = {
   duration: 30,              // seconds per wave
   firstSpawnInterval: 1.1,   // seconds between spawns in wave 1
-  spawnIntervalFactor: 0.91, // each wave multiplies the interval by this (was 0.82: half the ramp-up)
+  spawnIntervalFactor: 0.955, // each wave multiplies the interval by this (0.82 -> 0.91 -> 0.955: ramp-up halved twice)
   minSpawnInterval: 0.15,
   healBetweenWaves: Infinity, // hp restored to each player after a wave (Infinity = full heal)
   spawnRate: 1.2,            // x more enemies than the interval above gives (1.2 = +20%)
@@ -116,6 +116,7 @@ export const CURSE = {
 export const COINS = {
   dropByTier: { 0: 1, 1: 1, 2: 3, 3: 6, 4: 25 }, // tier 0 = rat, tier 4 = boss
   dropRate: 0.8,       // multiplier on the drops above (0.8 = 20% less; fractions are a chance of one more coin)
+  dropGrowth: 1.2,     // coin drops x1.2 every wave (wave 1 = x1, wave 2 = x1.2, wave 3 = x1.44 ...)
   radius: 7,
   pickupDelay: 1,      // seconds after dropping before a coin can be collected
   magnetRadius: 40,    // px beyond the player's edge that pulls coins in (upgradable)
