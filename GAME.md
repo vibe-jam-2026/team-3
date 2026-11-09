@@ -30,7 +30,7 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Arena | One box the size of the browser window; players can't leave it |
 | Chain | Physical rope of segments between the players, with a max length. When stretched it pulls the players toward each other |
 | Chain damage | Chain segments touching an enemy deal damage (likely scaled by how fast the segment moves, so swinging hits harder) |
-| Enemies | Spawn at the arena edge, walk toward the nearest player; touching a player deals damage |
+| Enemies | Basic enemy: a **rolling egg** that cracks open (shell halves + yolk splat) when killed. Spawns at the arena edge, walk toward the nearest player; touching a player deals damage |
 | Waves | Each wave lasts 30 s; enemies spawn faster and get tougher every wave. After a wave: a menu with a **Continue** button, the arena is cleared and both players heal to full |
 | Health | Each player has their own health; if **either** player dies it's game over (revive mechanics are an open question) |
 

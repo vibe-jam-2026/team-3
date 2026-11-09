@@ -1,6 +1,7 @@
-// Enemies: spawn at the arena edge, chase the nearest living player.
+// Enemies: rolling eggs that spawn at the arena edge and chase the nearest player.
 
 import { ENEMY } from './config.js';
+import { drawEgg, makeSpeckles } from './egg.js';
 
 export function spawnEnemy(game) {
   const { width, height, wave } = game;
@@ -22,6 +23,8 @@ export function spawnEnemy(game) {
     hitCooldown: 0,
     flash: 0,
     spawnAnim: 0.4,        // fade-in; harmless while spawning
+    roll: Math.random() * Math.PI * 2, // current rotation as it rolls
+    speckles: makeSpeckles(),
     dead: false,
   });
 }
@@ -30,6 +33,8 @@ export function updateEnemies(game, dt) {
   const enemies = game.enemies;
 
   for (const e of enemies) {
+    e.lastX = e.x;
+    e.lastY = e.y;
     e.hitCooldown = Math.max(0, e.hitCooldown - dt);
     e.flash = Math.max(0, e.flash - dt);
     e.spawnAnim = Math.max(0, e.spawnAnim - dt);
@@ -72,6 +77,14 @@ export function updateEnemies(game, dt) {
   for (const e of enemies) {
     e.x = Math.max(e.r, Math.min(game.width - e.r, e.x));
     e.y = Math.max(e.r, Math.min(game.height - e.r, e.y));
+
+    // Roll: turn by the distance travelled (arc length / radius),
+    // clockwise when moving right, counter-clockwise when moving left
+    const dx = e.x - e.lastX;
+    const dy = e.y - e.lastY;
+    const dist = Math.hypot(dx, dy);
+    const dirSign = dx + dy * 0.3 >= 0 ? 1 : -1;
+    e.roll += (dist / e.r) * dirSign;
   }
 }
 
@@ -87,20 +100,18 @@ function nearest(players, e) {
 
 export function drawEnemies(ctx, enemies) {
   for (const e of enemies) {
-    ctx.globalAlpha = 1 - e.spawnAnim / 0.4 * 0.8;
-    ctx.fillStyle = e.flash > 0 ? '#ffffff' : '#e5534b';
-    ctx.beginPath();
-    ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
-    ctx.fill();
+    const appear = 1 - e.spawnAnim / 0.4;           // 0 -> 1 while spawning
+    ctx.globalAlpha = 0.3 + 0.7 * appear;
+    drawEgg(ctx, e.x, e.y, e.r, e.roll, e.speckles, e.flash > 0, 0.5 + 0.5 * appear);
+    ctx.globalAlpha = 1;
 
-    // Health bar once damaged
-    if (e.hp < e.maxHp) {
+    // Health bar once damaged (for future weapons that don't one-hit)
+    if (e.hp > 0 && e.hp < e.maxHp) {
       const w = e.r * 2;
       ctx.fillStyle = '#3a1d1d';
-      ctx.fillRect(e.x - e.r, e.y - e.r - 7, w, 3);
+      ctx.fillRect(e.x - e.r, e.y - e.r * 1.5 - 5, w, 3);
       ctx.fillStyle = '#ff8a80';
-      ctx.fillRect(e.x - e.r, e.y - e.r - 7, w * (e.hp / e.maxHp), 3);
+      ctx.fillRect(e.x - e.r, e.y - e.r * 1.5 - 5, w * (e.hp / e.maxHp), 3);
     }
   }
-  ctx.globalAlpha = 1;
 }
