@@ -2,8 +2,8 @@
 
 export const PLAYER = {
   radius: 16,
-  speed: 260,          // px per second
-  maxHp: 150,          // was 100 (x1.5)
+  speed: 208,          // px per second (was 260, -20%)
+  maxHp: 120,          // starting hp (was 150, -20%)
   invulnTime: 0.6,     // seconds of invulnerability after being hit
 };
 
