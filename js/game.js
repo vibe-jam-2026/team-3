@@ -211,9 +211,15 @@ export function updateGame(game, dt) {
   // --- Win / lose ---
   if (game.players.some((p) => p.hp <= 0)) {
     game.status = 'dead';
-  } else if (game.waveTime >= WAVES.duration) {
+  } else if (game.waveTime >= WAVES.duration && !bossWaveUnfinished(game)) {
     game.status = 'waveComplete';
   }
+}
+
+/** Boss waves keep going after the timer until the boss has appeared and been killed. */
+function bossWaveUnfinished(game) {
+  if (game.wave % BOSS.everyWaves !== 0) return false;
+  return !game.bossSpawned || game.enemies.some((e) => e.boss);
 }
 
 function clampToArena(game, p) {
@@ -275,7 +281,15 @@ function drawHud(ctx, game) {
   ctx.font = '600 18px system-ui, sans-serif';
   ctx.fillText(`Wave ${game.wave}`, game.width / 2, 14);
   ctx.font = '700 28px system-ui, sans-serif';
-  ctx.fillText(String(Math.ceil(waveTimeLeft(game))), game.width / 2, 36);
+  if (waveTimeLeft(game) > 0) {
+    ctx.fillText(String(Math.ceil(waveTimeLeft(game))), game.width / 2, 36);
+  } else if (bossWaveUnfinished(game)) {
+    // Overtime: the boss wave only ends when the dinosaur is dead
+    ctx.fillStyle = '#ff8a80';
+    ctx.font = '700 22px system-ui, sans-serif';
+    ctx.fillText('Kill the boss!', game.width / 2, 38);
+    ctx.fillStyle = '#e8e6e1';
+  }
 
   ctx.textAlign = 'left';
   ctx.font = '600 16px system-ui, sans-serif';
