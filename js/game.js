@@ -107,7 +107,7 @@ export function updateGame(game, dt) {
   // Chain hurts enemies
   chainHits(game.chain, game.enemies, dt, (e, speed, vx, vy) => {
     if (e.hitCooldown > 0 || e.spawnAnim > 0) return;
-    e.hp -= speed * CHAIN.damagePerSpeed;
+    e.hp -= CHAIN.oneHitKill ? e.hp : speed * CHAIN.damagePerSpeed;
     e.hitCooldown = CHAIN.hitCooldown;
     e.flash = 0.08;
     e.vx += vx * CHAIN.knockback;

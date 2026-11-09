@@ -10,12 +10,13 @@ export const PLAYER = {
 
 export const CHAIN = {
   links: 14,           // number of points in the chain (more = smoother, heavier)
-  maxLength: 280,      // px; players can't be further apart than this
+  maxLength: 200,      // px; players can't be further apart than this
   iterations: 10,      // constraint solver passes (more = stiffer)
   damping: 0.97,       // 1 = no friction, lower = chain settles faster
   thickness: 4,        // px, also the hit width
   minHitSpeed: 120,    // px/s a link must move to hurt an enemy
-  damagePerSpeed: 0.06,// damage = speed * this (400 px/s -> 24 damage)
+  oneHitKill: true,    // chain kills any enemy in one hit, whatever its hp
+  damagePerSpeed: 0.06,// used when oneHitKill is false: damage = speed * this (400 px/s -> 24)
   hitCooldown: 0.25,   // seconds before the same enemy can be hit again
   knockback: 0.35,     // fraction of link velocity transferred to the enemy
 };
