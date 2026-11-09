@@ -4,7 +4,7 @@ import { wasPressed, endFrame } from './input.js';
 import {
   createGame, resizeGame, updateGame, drawGame, startNextWave, formatTime, PLAYER_COLORS,
 } from './game.js';
-import { drawSpace } from './space.js';
+import { drawBigBang, bigBangTime } from './bigbang.js';
 import { toggleMute, isMuted } from './audio.js';
 import { UPGRADES, upgradeCost, buyUpgrade } from './upgrades.js';
 
@@ -175,20 +175,40 @@ function draw() {
 
 // ---------- Screens ----------
 function drawTitle() {
-  drawSpace(ctx, width, height);
+  drawBigBang(ctx, width, height);
+  const t = bigBangTime();
 
   const cx = width / 2;
   const cy = height / 2;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  ctx.fillStyle = '#e8e6e1';
-  ctx.font = '700 64px system-ui, sans-serif';
-  ctx.fillText('TETHERED', cx, cy - 110);
+  // Title slams in out of the explosion
+  const tIn = Math.min(1, Math.max(0, (t - 0.5) / 0.6));
+  if (tIn > 0) {
+    const ease = 1 - (1 - tIn) ** 3;
+    const scale = 2.2 - 1.2 * ease;
+    ctx.save();
+    ctx.globalAlpha = tIn;
+    ctx.translate(cx, cy - 110);
+    ctx.scale(scale, scale);
+    ctx.shadowColor = 'rgba(255, 200, 120, 0.9)';
+    ctx.shadowBlur = 30 * (1 - ease) + 12;
+    ctx.fillStyle = '#fff6e6';
+    ctx.font = '800 64px system-ui, sans-serif';
+    ctx.fillText('TETHERED', 0, 0);
+    ctx.restore();
+  }
 
+  // The rest fades in a moment later
+  const tText = Math.min(1, Math.max(0, (t - 1.1) / 0.6));
+  ctx.globalAlpha = tText;
+  // Dark halo so the text stays readable on top of the glowing core
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+  ctx.shadowBlur = 8;
   ctx.font = '18px system-ui, sans-serif';
-  ctx.fillStyle = '#9a978f';
-  ctx.fillText('Two heads. One worm. Swing your body through the horde.', cx, cy - 60);
+  ctx.fillStyle = '#d9cfe8';
+  ctx.fillText('In the beginning there was one worm. With two heads.', cx, cy - 60);
 
   ctx.font = '600 18px system-ui, sans-serif';
   ctx.fillStyle = PLAYER_COLORS[0];
@@ -197,15 +217,18 @@ function drawTitle() {
   ctx.fillText('Player 2: Arrow keys', cx, cy + 30);
 
   const blink = Math.floor(performance.now() / 500) % 2 === 0;
-  if (blink) {
-    ctx.fillStyle = '#e8e6e1';
+  if (blink && t > 1.7) {
+    ctx.fillStyle = '#ffffff';
     ctx.font = '600 22px system-ui, sans-serif';
     ctx.fillText('Press Enter to start', cx, cy + 100);
   }
 
   ctx.font = '14px system-ui, sans-serif';
-  ctx.fillStyle = '#6b675f';
+  ctx.fillStyle = '#a79fb8';
   ctx.fillText(`Esc / P: pause · M: sound ${isMuted() ? 'off' : 'on'}`, cx, height - 30);
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = 'transparent';
 }
 
 function drawOverlay(title, lines) {
