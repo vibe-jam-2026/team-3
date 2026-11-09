@@ -5,7 +5,7 @@
 
 import { ALIEN, ENEMY } from './config.js';
 import { fireProjectile } from './projectiles.js';
-import { playPew } from './audio.js';
+import { playPew, playMeow } from './audio.js';
 
 export function spawnAlien(game) {
   const r = ALIEN.radius;
@@ -29,6 +29,7 @@ export function spawnAlien(game) {
     // Shooting: volleys of a few shots, a short gap between shots
     volleyTimer: 1.5, shotsLeft: 0, shotTimer: 0, aimX: 0, aimY: 0,
   });
+  playMeow(); // the space cat announces itself
 }
 
 function pickSpot(game, e) {

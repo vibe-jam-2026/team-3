@@ -10,7 +10,7 @@
 
 All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
-Current version: **1.01** (shown in the bottom-right corner of the game)
+Current version: **1.02** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
@@ -51,7 +51,7 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Secret | The shop has a free **Max All** card. Its second line, written in the same colour as the card, says *enemies*: the next wave becomes a flood (up to 300) of enemies that can't be killed |
 | Health | Each player has their own health; if **either** player dies it's game over (revive mechanics are an open question) |
 
-Sound: chickens cluck, roosters crow and rats squeak when they enter the arena (synthesised in `js/audio.js`, no sound files). **M** toggles sound.
+Sound: chickens cluck, roosters crow, rats squeak and the UFO cat says *mjau* when they enter the arena (synthesised in `js/audio.js`, no sound files). **M** toggles sound.
 
 All tuning numbers live in `js/config.js`. Debug URL options: `?god` (players can't take damage), `?wave=5` (5-second waves), `?start=4` (begin at wave 4), `?coins=200` (start with 200 coins) — e.g. `https://vibe-jam-2026.github.io/team-3/?god&wave=5`.
 
