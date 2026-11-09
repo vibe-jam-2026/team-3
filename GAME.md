@@ -2,6 +2,8 @@
 
 **▶ Play it: https://vibe-jam-2026.github.io/team-3/**
 
+**▶ Start at wave 5 (boss wave): https://vibe-jam-2026.github.io/team-3/?start=5**
+
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
 ## Pitch
