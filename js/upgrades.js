@@ -4,36 +4,38 @@
 import { PLAYER, CHAIN, COINS } from './config.js';
 
 // Tune here. cost = baseCost + costStep * currentLevel  (1, 2, 3, 4, 5, ...)
+// maxLevel: Infinity = no cap (set a number to cap an upgrade)
 export const UPGRADES = [
   {
     id: 'chain', name: 'Chain length', icon: '⛓',
     desc: (lvl) => `+${30} px chain (now ${Math.round(CHAIN.maxLength + 30 * lvl)} px)`,
-    baseCost: 1, costStep: 1, maxLevel: 6,
+    baseCost: 1, costStep: 1, maxLevel: Infinity,
   },
   {
     id: 'hp', name: 'Max health', icon: '❤',
     desc: (lvl) => `+25 max hp each (now ${PLAYER.maxHp + 25 * lvl})`,
-    baseCost: 1, costStep: 1, maxLevel: 6,
+    baseCost: 1, costStep: 1, maxLevel: Infinity,
   },
   {
     id: 'regen', name: 'Health regen', icon: '✚',
     desc: (lvl) => `+1 hp/s each (now ${lvl} hp/s)`,
-    baseCost: 1, costStep: 1, maxLevel: 5,
+    baseCost: 1, costStep: 1, maxLevel: Infinity,
   },
   {
     id: 'speed', name: 'Move speed', icon: '➤',
     desc: (lvl) => `+8% speed (now +${8 * lvl}%)`,
-    baseCost: 1, costStep: 1, maxLevel: 5,
+    baseCost: 1, costStep: 1, maxLevel: Infinity,
   },
   {
     id: 'slow', name: 'Enemy slow', icon: '❄',
-    desc: (lvl) => `Enemies 7% slower (now −${7 * lvl}%)`,
-    baseCost: 1, costStep: 1, maxLevel: 5,
+    // Multiplies, so it never reaches 0: each level makes enemies 7% slower than before
+    desc: (lvl) => `Enemies 7% slower (now −${Math.round((1 - 0.93 ** lvl) * 100)}%)`,
+    baseCost: 1, costStep: 1, maxLevel: Infinity,
   },
   {
     id: 'magnet', name: 'Coin magnet', icon: '🧲',
     desc: (lvl) => `+35 px pickup field (now ${COINS.magnetRadius + 35 * lvl} px)`,
-    baseCost: 1, costStep: 1, maxLevel: 5,
+    baseCost: 1, costStep: 1, maxLevel: Infinity,
   },
 ];
 
@@ -52,7 +54,7 @@ export function computeStats(levels) {
     maxHp: PLAYER.maxHp + 25 * levels.hp,
     regen: 1 * levels.regen,                 // hp per second
     speed: PLAYER.speed * (1 + 0.08 * levels.speed),
-    enemySpeedMult: 1 - 0.07 * levels.slow,
+    enemySpeedMult: 0.93 ** levels.slow,
     magnetRadius: COINS.magnetRadius + 35 * levels.magnet,
   };
 }

@@ -34,7 +34,7 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Waves | Each wave lasts 30 s; enemies spawn faster and get tougher every wave. After a wave: a menu with a **Continue** button, the arena is cleared and both players heal to full |
 | Rats | Neutral critters (from wave 1, max 4 at once). They never hurt the players. They run to the nearest egg, crack it in one bite and sit eating it for 2.5 s. Eggs eaten by rats give no kills or coins. The chain kills rats (1 coin) |
 | Coins | Killed enemies drop coins on the spot (egg 1, chicken 3, rooster 6). After 1 s they can be collected: by touching a player, by touching the **chain**, or by being pulled in by each player's small **magnet field**. The team shares one wallet. Coins still on the floor when the wave ends are lost |
-| Upgrades | Bought between waves in the shop (click or keys 1–6), shared by both players: **Chain length** (+30 px), **Max health** (+25), **Health regen** (+1 hp/s), **Move speed** (+8%), **Enemy slow** (−7% enemy speed), **Coin magnet** (+35 px field). Each has a max level and gets pricier per level |
+| Upgrades | Bought between waves in the shop (click or keys 1–6), shared by both players: **Chain length** (+30 px), **Max health** (+25), **Health regen** (+1 hp/s), **Move speed** (+8%), **Enemy slow** (−7% enemy speed), **Coin magnet** (+35 px field). No level cap; each level costs 1 more coin than the last (1, 2, 3, ...) |
 | Health | Each player has their own health; if **either** player dies it's game over (revive mechanics are an open question) |
 
 Sound: chickens cluck and roosters crow when they enter the arena (synthesised in `js/audio.js`, no sound files). **M** toggles sound.
