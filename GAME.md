@@ -10,7 +10,7 @@
 
 All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
-Current version: **1.00** (shown in the bottom-right corner of the game)
+Current version: **1.01** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
@@ -43,7 +43,7 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Enemies | Three tiers, all chase the nearest player and hurt on touch (no special abilities yet). **Tier 1 egg**: small, rolls, cracks open when killed. **Tier 2 chicken**: bigger, hits harder, bursts into feathers. **Tier 3 rooster**: biggest, hits hardest. Chickens appear from wave 2, roosters from wave 3, more of them each wave |
 | Waves | Each wave lasts 30 s; enemies spawn faster and get tougher every wave. After a wave: a menu with a **Continue** button, the arena is cleared and both players heal to full |
 | Boss | Every 5th wave (except every 10th) a **dinosaur** roars into the arena 5 s into the wave, and the wave doesn't end (after the 30 s timer the HUD says *Kill the boss!*) until it's dead. It stomps toward the players, then shows a red arrow for 1 s and charges across the arena in that direction until it hits a wall (then it's dazed briefly). It shoves players aside and hits hard. While it's alive, other enemies spawn 75% less. Takes **5 chain hits** to kill and drops 20 coins |
-| Alien boss | Every 10th wave an **alien** in a flying saucer arrives 5 s in, glides around and fires volleys of green shots (pew pew pew) in the players' general direction. Shots hurt players. The chain bounces shots back: bounced shots turn blue and hurt enemies and the alien. 8 hits to kill; like the dino, the wave lasts until it's dead |
+| Alien boss | Every 10th wave an **alien space cat** in a flying saucer arrives 5 s in, glides around and fires volleys of green shots (pew pew pew) in the players' general direction. Shots hurt players. The chain bounces shots back: bounced shots turn blue and hurt enemies and the alien. 8 hits to kill; like the dino, the wave lasts until it's dead |
 | Rats | Neutral critters (from wave 1, max 4 at once). They never hurt the players. They run to the nearest egg, crack it in one bite and sit eating it for 2.5 s. Eggs eaten by rats give no kills or coins. The chain kills rats (1 coin) |
 | Coins | Killed enemies drop coins on the spot (on average egg 0.8, chicken 2.4, rooster 4.8, boss 20). After 1 s they can be collected: by touching a player, by touching the **chain**, or by being pulled in by each player's small **magnet field**. The team shares one wallet. Coins still on the floor when the wave ends are lost |
 | Upgrades | Bought between waves in the shop (click or keys 1–7), shared by both players: **Chain length** (+30 px), **Max health** (+25), **Health regen** (+1 hp/s), **Move speed** (+8%), **Enemy slow** (−7% enemy speed), **Coin magnet** (+35 px field), **Rat health** (rats take +1 hit to kill). No level cap; prices follow Fibonacci: 1, 2, 3, 5, 8, 13, 21, ... |

@@ -1,4 +1,4 @@
-// Alien boss (every 10th wave): a little alien in a flying saucer.
+// Alien boss (every 10th wave): a space cat flying a saucer.
 // It glides around the arena and fires volleys of energy shots in the players'
 // general direction (not aimed exactly). The chain can bounce shots back;
 // bounced shots hurt enemies and the alien itself (see projectiles.js).
@@ -127,44 +127,95 @@ export function drawAlien(ctx, e, scale = 1) {
   ctx.lineWidth = 2;
   ctx.strokeStyle = '#2b2f3a';
 
-  // Alien inside the dome
-  ctx.fillStyle = flash ? '#fff' : '#7cd67a';
-  ctx.beginPath();
-  ctx.ellipse(0, -r * 0.42, r * 0.3, r * 0.34, 0, 0, Math.PI * 2);
-  ctx.fill();
-  // Big black eyes
-  ctx.fillStyle = '#111';
+  // The pilot: a cat in the dome
+  ctx.save();
+  ctx.translate(0, -r * 0.14); // sit high enough that the whole face shows above the rim
+  const fur = flash ? '#fff' : '#f0a04b';
+  const furDark = flash ? '#fff' : '#c9772a';
+  ctx.strokeStyle = '#5a3415';
+  ctx.lineWidth = 1.5;
+  // Ears (with pink insides)
   for (const s of [-1, 1]) {
+    ctx.fillStyle = fur;
     ctx.beginPath();
-    ctx.ellipse(s * r * 0.13, -r * 0.45, r * 0.1, r * 0.15, s * 0.5, 0, Math.PI * 2);
+    ctx.moveTo(s * r * 0.08, -r * 0.62);
+    ctx.lineTo(s * r * 0.27, -r * 0.8);
+    ctx.lineTo(s * r * 0.3, -r * 0.5);
+    ctx.closePath();
     ctx.fill();
-  }
-  ctx.fillStyle = '#fff';
-  for (const s of [-1, 1]) {
-    ctx.beginPath();
-    ctx.arc(s * r * 0.11, -r * 0.5, r * 0.03, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  // Antennae
-  ctx.strokeStyle = flash ? '#fff' : '#5fb35d';
-  ctx.lineWidth = 2;
-  for (const s of [-1, 1]) {
-    ctx.beginPath();
-    ctx.moveTo(s * r * 0.1, -r * 0.72);
-    ctx.lineTo(s * r * 0.22, -r * 0.92);
     ctx.stroke();
-    ctx.fillStyle = shooting ? '#ff5252' : '#ffeb3b';
+    ctx.fillStyle = flash ? '#fff' : '#f7b6c2';
     ctx.beginPath();
-    ctx.arc(s * r * 0.22, -r * 0.92, r * 0.05, 0, Math.PI * 2);
+    ctx.moveTo(s * r * 0.13, -r * 0.6);
+    ctx.lineTo(s * r * 0.25, -r * 0.72);
+    ctx.lineTo(s * r * 0.26, -r * 0.55);
+    ctx.closePath();
     ctx.fill();
   }
+  // Head
+  ctx.fillStyle = fur;
+  ctx.beginPath();
+  ctx.ellipse(0, -r * 0.42, r * 0.32, r * 0.28, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  // Tabby stripes on the forehead
+  ctx.strokeStyle = furDark;
+  ctx.lineWidth = 2;
+  for (const x of [-0.08, 0, 0.08]) {
+    ctx.beginPath();
+    ctx.moveTo(r * x, -r * 0.68);
+    ctx.lineTo(r * x * 0.8, -r * 0.58);
+    ctx.stroke();
+  }
+  // Eyes: green with slit pupils, glowing red while shooting
+  for (const s of [-1, 1]) {
+    ctx.fillStyle = shooting ? '#ff5252' : '#9be15d';
+    ctx.beginPath();
+    ctx.ellipse(s * r * 0.13, -r * 0.45, r * 0.08, r * 0.07, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.ellipse(s * r * 0.13, -r * 0.45, r * 0.02, r * 0.065, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(s * r * 0.11, -r * 0.48, r * 0.015, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // Nose and mouth
+  ctx.fillStyle = flash ? '#fff' : '#f48fb1';
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.035, -r * 0.36);
+  ctx.lineTo(r * 0.035, -r * 0.36);
+  ctx.lineTo(0, -r * 0.32);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#5a3415';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.arc(-r * 0.035, -r * 0.31, r * 0.035, 0, Math.PI);
+  ctx.arc(r * 0.035, -r * 0.31, r * 0.035, 0, Math.PI);
+  ctx.stroke();
+  // Whiskers
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.lineWidth = 1;
+  for (const s of [-1, 1]) {
+    for (const dy of [-0.03, 0.02]) {
+      ctx.beginPath();
+      ctx.moveTo(s * r * 0.12, -r * 0.34);
+      ctx.lineTo(s * r * 0.44, -r * (0.34 - dy * 2.5));
+      ctx.stroke();
+    }
+  }
+
+  ctx.restore();
 
   // Glass dome
   ctx.fillStyle = 'rgba(160, 220, 255, 0.28)';
   ctx.strokeStyle = 'rgba(200, 235, 255, 0.7)';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.ellipse(0, -r * 0.2, r * 0.5, r * 0.62, 0, Math.PI, Math.PI * 2);
+  ctx.ellipse(0, -r * 0.2, r * 0.52, r * 0.8, 0, Math.PI, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
   ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
