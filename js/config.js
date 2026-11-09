@@ -57,7 +57,7 @@ export const TIER_SPAWNS = {
 export const WAVES = {
   duration: 30,              // seconds per wave
   firstSpawnInterval: 1.1,   // seconds between spawns in wave 1
-  spawnIntervalFactor: 0.82, // each wave multiplies the interval by this
+  spawnIntervalFactor: 0.91, // each wave multiplies the interval by this (was 0.82: half the ramp-up)
   minSpawnInterval: 0.15,
   healBetweenWaves: Infinity, // hp restored to each player after a wave (Infinity = full heal)
   spawnRate: 1.2,            // x more enemies than the interval above gives (1.2 = +20%)

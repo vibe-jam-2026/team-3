@@ -55,7 +55,7 @@ All base values in the game. The real numbers live in `js/config.js` (and upgrad
 | What | Rule |
 |---|---|
 | Wave length | 30 s (boss waves continue until the dino is dead) |
-| Time between spawns | 1.1 s in wave 1, ×0.82 each wave, min 0.15 s; then ÷1.2 (20% more enemies) |
+| Time between spawns | 1.1 s in wave 1, ×0.91 each wave (9% shorter per wave), min 0.15 s; then ÷1.2 (20% more enemies) |
 | Enemy speed | ×1.05 per wave (not the dino) |
 | Enemy damage | ×1.05 per wave (dino too) |
 | Chickens | 15% of spawns at wave 2, +15 points per wave, max 45% |
@@ -66,7 +66,7 @@ Spawn interval by wave (after the 20% boost):
 
 | Wave | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 |
 |---|---|---|---|---|---|---|---|---|
-| Seconds between spawns | 0.92 | 0.75 | 0.62 | 0.51 | 0.41 | 0.34 | 0.23 | 0.15 |
+| Seconds between spawns | 0.92 | 0.83 | 0.76 | 0.69 | 0.63 | 0.57 | 0.47 | 0.39 |
 | Enemy speed (px/s) | 56 | 59 | 62 | 65 | 68 | 71 | 79 | 87 |
 | Damage ×  | 1.00 | 1.05 | 1.10 | 1.16 | 1.22 | 1.28 | 1.41 | 1.55 |
 
