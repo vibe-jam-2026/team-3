@@ -3,37 +3,37 @@
 
 import { PLAYER, CHAIN, COINS } from './config.js';
 
-// Tune here. cost = baseCost * costGrowth ^ currentLevel
+// Tune here. cost = baseCost + costStep * currentLevel  (1, 2, 3, 4, 5, ...)
 export const UPGRADES = [
   {
     id: 'chain', name: 'Chain length', icon: '⛓',
     desc: (lvl) => `+${30} px chain (now ${Math.round(CHAIN.maxLength + 30 * lvl)} px)`,
-    baseCost: 10, costGrowth: 1.6, maxLevel: 6,
+    baseCost: 1, costStep: 1, maxLevel: 6,
   },
   {
     id: 'hp', name: 'Max health', icon: '❤',
     desc: (lvl) => `+25 max hp each (now ${PLAYER.maxHp + 25 * lvl})`,
-    baseCost: 8, costGrowth: 1.5, maxLevel: 6,
+    baseCost: 1, costStep: 1, maxLevel: 6,
   },
   {
     id: 'regen', name: 'Health regen', icon: '✚',
     desc: (lvl) => `+1 hp/s each (now ${lvl} hp/s)`,
-    baseCost: 12, costGrowth: 1.7, maxLevel: 5,
+    baseCost: 1, costStep: 1, maxLevel: 5,
   },
   {
     id: 'speed', name: 'Move speed', icon: '➤',
     desc: (lvl) => `+8% speed (now +${8 * lvl}%)`,
-    baseCost: 10, costGrowth: 1.6, maxLevel: 5,
+    baseCost: 1, costStep: 1, maxLevel: 5,
   },
   {
     id: 'slow', name: 'Enemy slow', icon: '❄',
     desc: (lvl) => `Enemies 7% slower (now −${7 * lvl}%)`,
-    baseCost: 14, costGrowth: 1.7, maxLevel: 5,
+    baseCost: 1, costStep: 1, maxLevel: 5,
   },
   {
     id: 'magnet', name: 'Coin magnet', icon: '🧲',
     desc: (lvl) => `+35 px pickup field (now ${COINS.magnetRadius + 35 * lvl} px)`,
-    baseCost: 8, costGrowth: 1.5, maxLevel: 5,
+    baseCost: 1, costStep: 1, maxLevel: 5,
   },
 ];
 
@@ -42,7 +42,7 @@ export function createUpgradeLevels() {
 }
 
 export function upgradeCost(u, level) {
-  return Math.round(u.baseCost * u.costGrowth ** level);
+  return u.baseCost + u.costStep * level;
 }
 
 /** Turn upgrade levels into the numbers the game uses. */
