@@ -52,13 +52,21 @@ export const WAVES = {
   healBetweenWaves: Infinity, // hp restored to each player after a wave (Infinity = full heal)
 };
 
+// Coins dropped by enemies (per tier). The team shares one wallet.
+export const COINS = {
+  dropByTier: { 1: 1, 2: 3, 3: 6 },
+  radius: 7,
+};
+
 // Debug options from the URL, for testing:
 //   ?god          players can't take damage
 //   ?wave=5       waves last 5 seconds instead of WAVES.duration
 //   ?start=4      begin at wave 4 (to test later waves and enemy tiers)
+//   ?coins=200    start with 200 coins (to test upgrades)
 const params = new URLSearchParams(window.location.search);
 export const DEBUG = {
   god: params.has('god'),
   startWave: Math.max(1, Math.floor(Number(params.get('start')) || 1)),
+  startCoins: Math.max(0, Math.floor(Number(params.get('coins')) || 0)),
 };
 if (params.has('wave')) WAVES.duration = Number(params.get('wave')) || WAVES.duration;
