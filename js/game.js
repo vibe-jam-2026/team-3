@@ -3,12 +3,14 @@
 // and reports game.status = 'playing' | 'waveComplete' | 'dead'.
 
 import { moveVector } from './input.js';
-import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE } from './config.js';
+import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS } from './config.js';
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
 import { featherBurst } from './chicken.js';
 import { furBurst } from './rat.js';
+import { spawnBoss, hitBoss, drawBossArrows, drawBossBar, bossBurst } from './boss.js';
+import { playRoar } from './audio.js';
 import { dropCoins, updateCoins, drawCoins, drawCoinIcon, drawMagnetFields } from './coins.js';
 import { createUpgradeLevels, applyStats } from './upgrades.js';
 
@@ -29,6 +31,7 @@ export function createGame(width, height) {
     waveKills: 0,
     waveTime: 0,
     spawnTimer: 0,
+    bossSpawned: false, // has this wave's boss appeared yet?
     cursedWave: 0,  // set by the "Max All" button: that wave is a flood of unkillable enemies
     ratTimer: 2,    // first rat shows up a little into the wave
     status: 'playing',
@@ -65,6 +68,7 @@ export function startNextWave(game) {
   game.waveCoins = 0;
   game.spawnTimer = 0;
   game.ratTimer = 2;
+  game.bossSpawned = false;
   game.enemies = [];
   game.floorCoins = []; // uncollected coins are lost
   game.status = 'playing';
@@ -121,6 +125,13 @@ export function updateGame(game, dt) {
     game.spawnTimer += cursed ? CURSE.spawnInterval : spawnInterval(game.wave);
   }
 
+  // Boss wave: the dinosaur roars in a few seconds after the wave starts
+  if (game.wave % BOSS.everyWaves === 0 && !game.bossSpawned && game.waveTime >= BOSS.spawnAt) {
+    game.bossSpawned = true;
+    spawnBoss(game);
+    playRoar();
+  }
+
   // Rats (neutral egg hunters) on their own timer
   if (game.wave >= RATS.fromWave) {
     game.ratTimer -= dt;
@@ -136,6 +147,11 @@ export function updateGame(game, dt) {
   // Chain hurts enemies
   chainHits(game.chain, game.enemies, dt, (e, speed, vx, vy) => {
     if (e.hitCooldown > 0 || e.spawnAnim > 0) return;
+    if (e.boss) {
+      if (!e.invincible) hitBoss(e);
+      else e.flash = 0.08;
+      return;
+    }
     if (!e.invincible) e.hp -= CHAIN.oneHitKill ? e.hp : speed * CHAIN.damagePerSpeed;
     e.hitCooldown = CHAIN.hitCooldown;
     e.flash = 0.08;
@@ -153,8 +169,15 @@ export function updateGame(game, dt) {
       const d = Math.hypot(dx, dy) || 1;
       const min = e.r + p.r;
       if (d >= min) continue;
-      e.x = p.x + (dx / d) * min;
-      e.y = p.y + (dy / d) * min;
+      if (e.boss) {
+        // Too heavy to stop: the boss shoves the player aside instead
+        p.x = e.x - (dx / d) * min;
+        p.y = e.y - (dy / d) * min;
+        clampToArena(game, p);
+      } else {
+        e.x = p.x + (dx / d) * min;
+        e.y = p.y + (dy / d) * min;
+      }
       if (p.invuln <= 0 && !DEBUG.god) {
         p.hp = Math.max(0, p.hp - e.damage);
         p.invuln = PLAYER.invulnTime;
@@ -167,6 +190,7 @@ export function updateGame(game, dt) {
     if (e.hp <= 0 && !e.dead) {
       e.dead = true;
       if (e.type === 'egg') crackEgg(game.effects, e, e.lastHitVx, e.lastHitVy);
+      else if (e.boss) bossBurst(game.effects, e);
       else if (e.type === 'rat') furBurst(game.effects, e, e.lastHitVx, e.lastHitVy);
       else featherBurst(game.effects, e, e.lastHitVx, e.lastHitVy);
       // An egg eaten by a rat is gone: no kill and no coins for the players
@@ -206,6 +230,7 @@ export function drawGame(ctx, game) {
   drawFloorEffects(ctx, game.effects);
   drawMagnetFields(ctx, game);
   drawCoins(ctx, game.floorCoins);
+  drawBossArrows(ctx, game.enemies, game.width, game.height);
   drawEnemies(ctx, game.enemies);
   drawChain(ctx, game.chain);
   drawAirEffects(ctx, game.effects);
@@ -261,6 +286,8 @@ function drawHud(ctx, game) {
 
   ctx.textAlign = 'right';
   ctx.fillText(`Time: ${formatTime(game.time)}`, game.width - 18, 16);
+
+  drawBossBar(ctx, game);
 }
 
 export function formatTime(seconds) {

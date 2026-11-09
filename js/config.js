@@ -64,6 +64,21 @@ export const WAVES = {
   healBetweenWaves: Infinity, // hp restored to each player after a wave (Infinity = full heal)
 };
 
+// Boss: a big dinosaur every few waves (see boss.js)
+export const BOSS = {
+  everyWaves: 5,     // waves 5, 10, 15, ...
+  spawnAt: 5,        // seconds into the wave
+  radius: 46,
+  hits: 20,          // chain hits needed to kill it
+  hitCooldown: 0.3,  // seconds between hits that count
+  damage: 35,        // per touch (grows x1.05 per wave like other enemies)
+  walkSpeed: 55,     // px/s while stomping toward the players
+  walkTime: 2.5,     // seconds of walking between charges
+  aimTime: 1,        // seconds the arrow is shown before the charge
+  chargeSpeed: 620,  // px/s while charging
+  recoverTime: 1.2,  // seconds dazed after hitting a wall
+};
+
 // The "Max All" gimmick button in the shop secretly means "Max All enemies":
 // the next wave spawns a flood of enemies that can't be killed.
 export const CURSE = {
@@ -73,7 +88,7 @@ export const CURSE = {
 
 // Coins dropped by enemies (per tier). The team shares one wallet.
 export const COINS = {
-  dropByTier: { 0: 1, 1: 1, 2: 3, 3: 6 }, // tier 0 = rat
+  dropByTier: { 0: 1, 1: 1, 2: 3, 3: 6, 4: 25 }, // tier 0 = rat, tier 4 = boss
   radius: 7,
   pickupDelay: 1,      // seconds after dropping before a coin can be collected
   magnetRadius: 40,    // px beyond the player's edge that pulls coins in (upgradable)
