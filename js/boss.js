@@ -335,7 +335,8 @@ export function drawBossBar(ctx, game) {
   ctx.font = '700 13px system-ui, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.fillText(`DINO BOSS · ${Math.max(0, boss.hitsLeft)} hits left`, game.width / 2, y + 14);
+  const name = boss.type === 'alien' ? 'ALIEN BOSS' : 'DINO BOSS';
+  ctx.fillText(`${name} · ${Math.max(0, boss.hitsLeft)} hits left`, game.width / 2, y + 14);
 }
 
 /** Death: a big puff and a burst of green scales (uses the shared feather effect). */

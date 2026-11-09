@@ -7,6 +7,7 @@ import { drawChicken } from './chicken.js';
 import { playCluck, playCrow } from './audio.js';
 import { updateRat, drawRat } from './rat.js';
 import { updateBoss, drawBoss } from './boss.js';
+import { updateAlien, drawAlien } from './alien.js';
 
 /** Pick which kind of enemy to spawn this wave. */
 function pickType(wave) {
@@ -81,7 +82,10 @@ export function updateEnemies(game, dt) {
     // Rats hunt eggs; everything else chases the nearest player
     const target = e.type === 'rat' || e.boss ? null : nearest(game.players, e);
     if (e.type === 'rat' && e.spawnAnim <= 0) updateRat(game, e, dt);
-    if (e.boss && e.spawnAnim <= 0) updateBoss(game, e, dt);
+    if (e.boss && e.spawnAnim <= 0) {
+      if (e.type === 'alien') updateAlien(game, e, dt);
+      else updateBoss(game, e, dt);
+    }
     if (target) {
       const dx = target.x - e.x;
       const dy = target.y - e.y;
@@ -149,7 +153,8 @@ export function drawEnemies(ctx, enemies) {
     const appear = 1 - e.spawnAnim / 0.4;           // 0 -> 1 while spawning
     ctx.globalAlpha = 0.3 + 0.7 * appear;
     const scale = 0.5 + 0.5 * appear;
-    if (e.boss) drawBoss(ctx, e, scale);
+    if (e.type === 'alien') drawAlien(ctx, e, scale);
+    else if (e.boss) drawBoss(ctx, e, scale);
     else if (e.type === 'rat') drawRat(ctx, e, scale);
     else if (e.type === 'egg') drawEgg(ctx, e.x, e.y, e.r, e.roll, e.speckles, e.flash > 0, scale);
     else drawChicken(ctx, e, e.type === 'rooster', scale);

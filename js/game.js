@@ -3,7 +3,7 @@
 // and reports game.status = 'playing' | 'waveComplete' | 'dead'.
 
 import { moveVector } from './input.js';
-import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS } from './config.js';
+import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS, ALIEN } from './config.js';
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
@@ -11,6 +11,9 @@ import { featherBurst } from './chicken.js';
 import { furBurst } from './rat.js';
 import { spawnBoss, hitBoss, drawBossArrows, drawBossBar, bossBurst } from './boss.js';
 import { playRoar } from './audio.js';
+import { spawnAlien, alienBurst } from './alien.js';
+import { updateProjectiles, drawProjectiles } from './projectiles.js';
+import { applyDevStartUpgrades } from './upgrades.js';
 import { dropCoins, updateCoins, drawCoins, drawCoinIcon, drawMagnetFields } from './coins.js';
 import { createUpgradeLevels, applyStats } from './upgrades.js';
 
@@ -42,10 +45,12 @@ export function createGame(width, height) {
     coins: DEBUG.startCoins, // the team's shared wallet
     waveCoins: 0,
     floorCoins: [], // dropped coins waiting to be picked up
+    projectiles: [], // alien shots
     upgrades: createUpgradeLevels(),
     stats: null,
   };
   applyStats(game);
+  if (DEBUG.startWave > 1) applyDevStartUpgrades(game, DEBUG.startWave);
   return game;
 }
 
@@ -70,6 +75,7 @@ export function startNextWave(game) {
   game.ratTimer = 2;
   game.bossSpawned = false;
   game.enemies = [];
+  game.projectiles = [];
   game.floorCoins = []; // uncollected coins are lost
   game.status = 'playing';
   for (const p of game.players) {
@@ -128,8 +134,12 @@ export function updateGame(game, dt) {
     game.spawnTimer += cursed ? CURSE.spawnInterval : spawnInterval(game.wave) / rate;
   }
 
-  // Boss wave: the dinosaur roars in a few seconds after the wave starts
-  if (game.wave % BOSS.everyWaves === 0 && !game.bossSpawned && game.waveTime >= BOSS.spawnAt) {
+  // Boss waves: every 10th wave the alien, otherwise every 5th the dinosaur
+  const boss = bossForWave(game.wave);
+  if (boss === 'alien' && !game.bossSpawned && game.waveTime >= ALIEN.spawnAt) {
+    game.bossSpawned = true;
+    spawnAlien(game);
+  } else if (boss === 'dino' && !game.bossSpawned && game.waveTime >= BOSS.spawnAt) {
     game.bossSpawned = true;
     spawnBoss(game);
     playRoar();
@@ -146,6 +156,8 @@ export function updateGame(game, dt) {
 
   // --- Enemies ---
   updateEnemies(game, dt);
+
+  updateProjectiles(game, dt);
 
   // Chain hurts enemies
   chainHits(game.chain, game.enemies, dt, (e, speed, vx, vy) => {
@@ -196,6 +208,7 @@ export function updateGame(game, dt) {
     if (e.hp <= 0 && !e.dead) {
       e.dead = true;
       if (e.type === 'egg') crackEgg(game.effects, e, e.lastHitVx, e.lastHitVy);
+      else if (e.type === 'alien') alienBurst(game.effects, e);
       else if (e.boss) bossBurst(game.effects, e);
       else if (e.type === 'rat') furBurst(game.effects, e, e.lastHitVx, e.lastHitVy);
       else featherBurst(game.effects, e, e.lastHitVx, e.lastHitVy);
@@ -219,9 +232,16 @@ export function updateGame(game, dt) {
   }
 }
 
+/** Which boss (if any) this wave has: 'alien' every 10th wave, 'dino' every other 5th. */
+export function bossForWave(wave) {
+  if (wave % ALIEN.everyWaves === 0) return 'alien';
+  if (wave % BOSS.everyWaves === 0) return 'dino';
+  return null;
+}
+
 /** Boss waves keep going after the timer until the boss has appeared and been killed. */
 function bossWaveUnfinished(game) {
-  if (game.wave % BOSS.everyWaves !== 0) return false;
+  if (!bossForWave(game.wave)) return false;
   return !game.bossSpawned || game.enemies.some((e) => e.boss);
 }
 
@@ -246,6 +266,7 @@ export function drawGame(ctx, game) {
   drawEnemies(ctx, game.enemies);
   drawChain(ctx, game.chain);
   drawAirEffects(ctx, game.effects);
+  drawProjectiles(ctx, game.projectiles);
 
   for (const p of game.players) drawPlayer(ctx, p);
 
@@ -287,7 +308,7 @@ function drawHud(ctx, game) {
   if (waveTimeLeft(game) > 0) {
     ctx.fillText(String(Math.ceil(waveTimeLeft(game))), game.width / 2, 36);
   } else if (bossWaveUnfinished(game)) {
-    // Overtime: the boss wave only ends when the dinosaur is dead
+    // Overtime: the boss wave only ends when the boss is dead
     ctx.fillStyle = '#ff8a80';
     ctx.font = '700 22px system-ui, sans-serif';
     ctx.fillText('Kill the boss!', game.width / 2, 38);

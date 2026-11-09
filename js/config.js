@@ -63,9 +63,9 @@ export const WAVES = {
   spawnRate: 1.2,            // x more enemies than the interval above gives (1.2 = +20%)
 };
 
-// Boss: a big dinosaur every few waves (see boss.js)
+// Boss: a big dinosaur every few waves (see boss.js). Every 10th wave is the alien instead.
 export const BOSS = {
-  everyWaves: 5,     // waves 5, 10, 15, ...
+  everyWaves: 5,     // waves 5, 15, 25, ... (10, 20, 30 are alien waves)
   spawnAt: 5,        // seconds into the wave (boss waves don't end until it's dead)
   radius: 46,
   hits: 5,           // chain hits needed to kill it
@@ -77,6 +77,32 @@ export const BOSS = {
   chargeSpeed: 620,  // px/s while charging
   recoverTime: 1.2,  // seconds dazed after hitting a wall
   enemySpawnRate: 0.25, // while the boss is alive, other enemies spawn at this rate (0.25 = 75% fewer)
+};
+
+// Alien boss: every 10th wave instead of the dino (see alien.js, projectiles.js).
+// Same rules as the dino: arrives spawnAt s into the wave, the wave lasts until it's dead.
+export const ALIEN = {
+  everyWaves: 10,          // waves 10, 20, 30, ...
+  spawnAt: 5,              // seconds into the wave
+  radius: 44,
+  hits: 8,                 // hits to kill (chain or bounced shots)
+  damage: 25,              // per touch (grows x1.05 per wave)
+  moveSpeed: 90,           // px/s while gliding around
+  volleyInterval: 1.6,     // seconds between volleys
+  shotsPerVolley: [3, 5],  // random number of shots per volley
+  shotGap: 0.12,           // seconds between shots in a volley
+  spread: 0.6,             // radians of random spread around the players' general direction
+  projectileSpeed: 230,    // px/s
+  projectileDamage: 15,    // per shot hit on a player (grows x1.05 per wave)
+  projectileRadius: 6,
+  projectileLife: 6,       // seconds before a shot fizzles out
+  reflectSpeedMult: 1.4,   // bounced shots get this much faster
+};
+
+// Dev start (?start=N): give the players upgrades worth about what they'd have bought
+// by then: budget = devCoinsFactor * (N - 1) ^ 1.5 coins, spent evenly across all upgrades.
+export const DEV_START = {
+  coinsFactor: 12,
 };
 
 // The "Max All" gimmick button in the shop secretly means "Max All enemies":

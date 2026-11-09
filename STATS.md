@@ -32,15 +32,18 @@ All base values in the game. The real numbers live in `js/config.js` (and upgrad
 
 ## Enemies
 
-| | Egg | Chicken | Rooster | Rat | Dino boss |
-|---|---|---|---|---|---|
-| Chain hits to kill | 1 | 2 | 3 | 1 | 5 |
-| Damage per touch (wave 1) | 10 | 18 | 28 | 0 (neutral) | 35 |
-| Speed (wave 1) | 56 px/s | 56 px/s | 56 px/s | 105 px/s (half when wandering) | 55 walking / 620 charging |
-| Size (radius) | 12 px | 17 px | 22 px | 10 px | 46 px |
-| Coins (base) | 1 | 3 | 6 | 1 | 25 |
-| Coins (on average, ×0.8) | 0.8 | 2.4 | 4.8 | 0.8 | 20 |
-| First appears | wave 1 | wave 2 | wave 3 | wave 1 | waves 5, 10, 15, … |
+| | Egg | Chicken | Rooster | Rat | Dino boss | Alien boss |
+|---|---|---|---|---|---|---|
+| Hits to kill | 1 | 2 | 3 | 1 | 5 | 8 |
+| Damage per touch (wave 1) | 10 | 18 | 28 | 0 (neutral) | 35 | 25 |
+| Shot damage (wave 1) | – | – | – | – | – | 15 |
+| Speed (wave 1) | 56 px/s | 56 px/s | 56 px/s | 105 px/s (half when wandering) | 55 walking / 620 charging | 90 gliding |
+| Size (radius) | 12 px | 17 px | 22 px | 10 px | 46 px | 44 px |
+| Coins (base) | 1 | 3 | 6 | 1 | 25 | 25 |
+| Coins (on average, ×0.8) | 0.8 | 2.4 | 4.8 | 0.8 | 20 | 20 |
+| First appears | wave 1 | wave 2 | wave 3 | wave 1 | waves 5, 15, 25, … | waves 10, 20, 30, … |
+
+- A hit is a chain swing **or a bounced alien shot** (bounced shots hurt every enemy and both bosses).
 
 - Each enemy also has an unused `hp` value (egg 25, chicken 50, rooster 90, rat 15, +6 per wave) kept for future weapons; the chain counts hits instead.
 - Coin drops with a fraction become a chance of one extra coin (e.g. 2.4 = 2 coins + 40% chance of a third).
@@ -79,12 +82,27 @@ Spawn interval by wave (after the 20% boost):
 
 | Stat | Value |
 |---|---|
-| Appears | 5 s into waves 5, 10, 15, … |
+| Appears | 5 s into waves 5, 15, 25, … (every 5th wave that isn't an alien wave) |
 | Walk toward nearest player | 2.5 s at 55 px/s |
 | Arrow shown before charging | 1 s |
 | Charge | 620 px/s until it hits a wall |
 | Dazed after the charge | 1.2 s |
 | Other enemies while it's alive | spawn 75% less |
+| Wave ends | only when it's dead (after 30 s the HUD says *Kill the boss!*) |
+
+## Alien boss
+
+| Stat | Value |
+|---|---|
+| Appears | 5 s into waves 10, 20, 30, … (replaces the dino on those waves) |
+| Movement | glides to random spots at 90 px/s, pauses 0.6–1.4 s |
+| Volleys | every 1.6 s, 3–5 shots, 0.12 s apart |
+| Aim | the middle of the two players ± 0.6 rad (≈34°) random spread |
+| Shot speed / size | 230 px/s / radius 6 px, fizzles after 6 s or at the wall |
+| Shot damage | 15 to a player (×1.05 per wave) |
+| Bounced by the chain | any touch (no swing needed); turns blue, ×1.4 speed, then hurts enemies and bosses (1 hit each) instead of players |
+| Other enemies while it's alive | spawn 75% less |
+| Wave ends | only when it's dead |
 
 ## Upgrades (shop between waves)
 
@@ -107,7 +125,8 @@ Spawn interval by wave (after the 20% boost):
 |---|---|
 | `?god` | players can't take damage |
 | `?wave=5` | waves last 5 s |
-| `?start=5` | begin at wave 5 |
+| `?start=5` | begin at wave 5, with upgrades worth ≈ 96 coins (every upgrade level 3) |
+| `?start=10` | begin at wave 10, with upgrades worth ≈ 324 coins (every upgrade level 5) |
 | `?coins=200` | start with 200 coins |
 
-Combine them, e.g. `?god&start=5&coins=200`.
+Any `?start=N` gives upgrades worth `12 × (N − 1)^1.5` coins, spent evenly across all upgrades (cheapest next level first). Combine options, e.g. `?god&start=5&coins=200`.
