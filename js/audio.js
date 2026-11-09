@@ -4,12 +4,12 @@
 
 const MASTER_VOLUME = 0.5;
 // Don't spam: at most one sound of each kind per this many seconds
-const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4 };
+const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1 };
 
 let ctx = null;
 let master = null;
 let muted = false;
-const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity };
+const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity };
 
 try { muted = localStorage.getItem('tethered-muted') === '1'; } catch { /* storage blocked */ }
 
@@ -59,6 +59,12 @@ export function playCluck() {
 export function playCrow() {
   if (!canPlay('crow')) return;
   crow(ctx, master, ctx.currentTime);
+}
+
+/** The space cat's UFO arrives: "mjau". */
+export function playMeow() {
+  if (!canPlay('meow')) return;
+  meow(ctx, master, ctx.currentTime);
 }
 
 /** A rat enters the arena: a couple of high squeaks. */
@@ -252,4 +258,43 @@ export function squeak(ac, dest, t) {
     o.start(st); o.stop(st + dur + 0.02);
     lfo.start(st); lfo.stop(st + dur + 0.02);
   }
+}
+
+export function meow(ac, dest, t) {
+  // "mi-aaa-u": a nasal voice whose pitch rises then falls, while two mouth
+  // filters (formants) glide from an "i" through an "a" to an "u"
+  const dur = 0.75;
+  const base = 520 + Math.random() * 80;
+  const o = ac.createOscillator();
+  o.type = 'sawtooth';
+  o.frequency.setValueAtTime(base, t);
+  o.frequency.linearRampToValueAtTime(base * 1.6, t + dur * 0.35);
+  o.frequency.linearRampToValueAtTime(base * 1.45, t + dur * 0.6);
+  o.frequency.linearRampToValueAtTime(base * 0.95, t + dur);
+  const vib = ac.createOscillator();
+  const vibGain = ac.createGain();
+  vib.frequency.value = 6;
+  vibGain.gain.value = 10;
+  vib.connect(vibGain).connect(o.frequency);
+
+  const env = ac.createGain();
+  env.gain.setValueAtTime(0.0001, t);
+  env.gain.exponentialRampToValueAtTime(0.45, t + 0.06);
+  env.gain.setValueAtTime(0.45, t + dur * 0.65);
+  env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+  //            "i"          "a"         "u"
+  const f1 = [[350, 0], [900, 0.35], [400, 1]];
+  const f2 = [[2300, 0], [1300, 0.35], [800, 1]];
+  for (const track of [f1, f2]) {
+    const bp = ac.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.Q.value = 6;
+    bp.frequency.setValueAtTime(track[0][0], t);
+    for (const [f, at] of track.slice(1)) bp.frequency.linearRampToValueAtTime(f, t + dur * at);
+    o.connect(bp).connect(env);
+  }
+  env.connect(dest);
+  o.start(t); o.stop(t + dur + 0.05);
+  vib.start(t); vib.stop(t + dur + 0.05);
 }
