@@ -35,7 +35,7 @@ All base values in the game. The real numbers live in `js/config.js` (and upgrad
 
 | | Egg | Chicken | Rooster | Rat | Dino boss | Alien boss |
 |---|---|---|---|---|---|---|
-| Hits to kill | 1 | 2 | 3 | 1 | 5 | 8 |
+| Hits to kill | 1 | 2 | 3 | 1 (+1 per Rat health level) | 5 | 8 |
 | Damage per touch (wave 1) | 10 | 18 | 28 | 0 (neutral) | 35 | 25 |
 | Shot damage (wave 1) | – | – | – | – | – | 15 |
 | Speed (wave 1) | 56 px/s | 56 px/s | 56 px/s | 105 px/s (half when wandering) | 55 walking / 620 charging | 90 gliding |
@@ -115,6 +115,7 @@ Spawn interval by wave (after the 20% boost):
 | 4 | Move speed | +8% of base |
 | 5 | Enemy slow | enemies ×0.93 speed (5 levels ≈ −30%, 12 ≈ −58%) |
 | 6 | Coin magnet | +35 px field |
+| 7 | Rat health | rats take +1 chain hit to kill (1 → 2 → 3 …) |
 
 - No level cap.
 - Price per level follows Fibonacci, the same for every upgrade: **1, 2, 3, 5, 8, 13, 21, 34, 55, …**
