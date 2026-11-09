@@ -1,44 +1,155 @@
-// Game state: players, arena and the update/draw for the "playing" screen.
-// Phase 3 adds the chain, enemies and damage here.
+// Game state: players, chain, enemies and waves.
+// main.js decides which screen is shown; this file only runs one wave at a time
+// and reports game.status = 'playing' | 'waveComplete' | 'dead'.
 
 import { moveVector } from './input.js';
+import { PLAYER, CHAIN, WAVES, DEBUG } from './config.js';
+import { createChain, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
+import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 
 export const PLAYER_COLORS = ['#4fc3f7', '#ffb74d'];
 
-const PLAYER_RADIUS = 16;
-const PLAYER_SPEED = 260; // pixels per second
-
 export function createGame(width, height) {
-  return {
+  const gap = Math.min(CHAIN.maxLength * 0.6, width * 0.3);
+  const players = [
+    makePlayer(0, width / 2 - gap / 2, height / 2),
+    makePlayer(1, width / 2 + gap / 2, height / 2),
+  ];
+  const game = {
     width,
     height,
-    time: 0,
-    players: [
-      makePlayer(0, width * 0.4, height / 2),
-      makePlayer(1, width * 0.6, height / 2),
-    ],
+    time: 0,        // total time survived
+    kills: 0,
+    wave: 1,
+    waveKills: 0,
+    waveTime: 0,
+    spawnTimer: 0,
+    status: 'playing',
+    players,
+    chain: createChain(players[0], players[1]),
+    enemies: [],
+    particles: [],
   };
+  return game;
 }
 
 function makePlayer(index, x, y) {
-  return { index, x, y, r: PLAYER_RADIUS, color: PLAYER_COLORS[index] };
+  return {
+    index, x, y,
+    r: PLAYER.radius,
+    color: PLAYER_COLORS[index],
+    hp: PLAYER.maxHp,
+    invuln: 0,
+  };
 }
 
-/** Keep the arena the size of the window; pull players back inside if it shrinks. */
+/** Called from the between-waves menu: clear the arena and begin the next wave. */
+export function startNextWave(game) {
+  game.wave += 1;
+  game.waveTime = 0;
+  game.waveKills = 0;
+  game.spawnTimer = 0;
+  game.enemies = [];
+  game.status = 'playing';
+  for (const p of game.players) {
+    p.hp = Math.min(PLAYER.maxHp, p.hp + WAVES.healBetweenWaves);
+    p.invuln = 1; // a moment of safety at the start of the wave
+  }
+}
+
+export function waveTimeLeft(game) {
+  return Math.max(0, WAVES.duration - game.waveTime);
+}
+
+/** Keep the arena the size of the window; pull everything back inside if it shrinks. */
 export function resizeGame(game, width, height) {
   game.width = width;
   game.height = height;
   for (const p of game.players) clampToArena(game, p);
 }
 
-export function updateGame(game, dt) {
-  game.time += dt;
+function spawnInterval(wave) {
+  return Math.max(
+    WAVES.minSpawnInterval,
+    WAVES.firstSpawnInterval * WAVES.spawnIntervalFactor ** (wave - 1),
+  );
+}
 
+export function updateGame(game, dt) {
+  if (game.status !== 'playing') return;
+  game.time += dt;
+  game.waveTime += dt;
+
+  // --- Players ---
   for (const p of game.players) {
     const dir = moveVector(p.index);
-    p.x += dir.x * PLAYER_SPEED * dt;
-    p.y += dir.y * PLAYER_SPEED * dt;
-    clampToArena(game, p);
+    p.x += dir.x * PLAYER.speed * dt;
+    p.y += dir.y * PLAYER.speed * dt;
+    p.invuln = Math.max(0, p.invuln - dt);
+  }
+  const [a, b] = game.players;
+  constrainPlayers(a, b);
+  for (const p of game.players) clampToArena(game, p);
+
+  // --- Chain ---
+  updateChain(game.chain, a, b, game.width, game.height);
+
+  // --- Spawning ---
+  game.spawnTimer -= dt;
+  while (game.spawnTimer <= 0) {
+    spawnEnemy(game);
+    game.spawnTimer += spawnInterval(game.wave);
+  }
+
+  // --- Enemies ---
+  updateEnemies(game, dt);
+
+  // Chain hurts enemies
+  chainHits(game.chain, game.enemies, dt, (e, speed, vx, vy) => {
+    if (e.hitCooldown > 0 || e.spawnAnim > 0) return;
+    e.hp -= speed * CHAIN.damagePerSpeed;
+    e.hitCooldown = CHAIN.hitCooldown;
+    e.flash = 0.08;
+    e.vx += vx * CHAIN.knockback;
+    e.vy += vy * CHAIN.knockback;
+  });
+
+  // Enemies hurt players, and can't walk through them
+  for (const e of game.enemies) {
+    if (e.spawnAnim > 0) continue;
+    for (const p of game.players) {
+      const dx = e.x - p.x;
+      const dy = e.y - p.y;
+      const d = Math.hypot(dx, dy) || 1;
+      const min = e.r + p.r;
+      if (d >= min) continue;
+      e.x = p.x + (dx / d) * min;
+      e.y = p.y + (dy / d) * min;
+      if (p.invuln <= 0 && !DEBUG.god) {
+        p.hp = Math.max(0, p.hp - PLAYER.hitDamage);
+        p.invuln = PLAYER.invulnTime;
+      }
+    }
+  }
+
+  // Remove dead enemies
+  for (const e of game.enemies) {
+    if (e.hp <= 0 && !e.dead) {
+      e.dead = true;
+      game.kills += 1;
+      game.waveKills += 1;
+      burst(game, e.x, e.y, '#e5534b');
+    }
+  }
+  game.enemies = game.enemies.filter((e) => !e.dead);
+
+  updateParticles(game, dt);
+
+  // --- Win / lose ---
+  if (game.players.some((p) => p.hp <= 0)) {
+    game.status = 'dead';
+  } else if (game.waveTime >= WAVES.duration) {
+    game.status = 'waveComplete';
   }
 }
 
@@ -47,6 +158,25 @@ function clampToArena(game, p) {
   p.y = Math.max(p.r, Math.min(game.height - p.r, p.y));
 }
 
+// ---------- Particles (tiny bit of juice for kills) ----------
+function burst(game, x, y, color) {
+  for (let i = 0; i < 10; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 60 + Math.random() * 160;
+    game.particles.push({ x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 0.4, color });
+  }
+}
+
+function updateParticles(game, dt) {
+  for (const p of game.particles) {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.life -= dt;
+  }
+  game.particles = game.particles.filter((p) => p.life > 0);
+}
+
+// ---------- Drawing ----------
 export function drawGame(ctx, game) {
   // Arena
   ctx.fillStyle = '#1a1d24';
@@ -55,36 +185,61 @@ export function drawGame(ctx, game) {
   ctx.lineWidth = 4;
   ctx.strokeRect(2, 2, game.width - 4, game.height - 4);
 
-  // Placeholder link between the players — becomes the real chain in Phase 3.
-  const [a, b] = game.players;
-  ctx.strokeStyle = '#555c6b';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([6, 8]);
-  ctx.beginPath();
-  ctx.moveTo(a.x, a.y);
-  ctx.lineTo(b.x, b.y);
-  ctx.stroke();
-  ctx.setLineDash([]);
+  drawEnemies(ctx, game.enemies);
+  drawChain(ctx, game.chain);
 
-  // Players
-  for (const p of game.players) {
+  for (const p of game.particles) {
+    ctx.globalAlpha = Math.max(0, p.life / 0.4);
     ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#111318';
-    ctx.font = 'bold 14px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`P${p.index + 1}`, p.x, p.y + 1);
+    ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
   }
+  ctx.globalAlpha = 1;
 
-  // HUD: time survived
-  ctx.fillStyle = '#e8e6e1';
-  ctx.font = '600 20px system-ui, sans-serif';
+  for (const p of game.players) drawPlayer(ctx, p);
+
+  drawHud(ctx, game);
+}
+
+function drawPlayer(ctx, p) {
+  // Blink while invulnerable
+  if (p.invuln > 0 && Math.floor(p.invuln * 15) % 2 === 0) ctx.globalAlpha = 0.4;
+  ctx.fillStyle = p.color;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#111318';
+  ctx.font = 'bold 14px system-ui, sans-serif';
   ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(`P${p.index + 1}`, p.x, p.y + 1);
+  ctx.globalAlpha = 1;
+
+  // Health bar under the player
+  const w = 40;
+  const x = p.x - w / 2;
+  const y = p.y + p.r + 6;
+  ctx.fillStyle = '#2c313c';
+  ctx.fillRect(x, y, w, 5);
+  ctx.fillStyle = p.hp > 30 ? '#66bb6a' : '#ef5350';
+  ctx.fillRect(x, y, w * (p.hp / PLAYER.maxHp), 5);
+}
+
+function drawHud(ctx, game) {
   ctx.textBaseline = 'top';
-  ctx.fillText(formatTime(game.time), game.width / 2, 16);
+  ctx.fillStyle = '#e8e6e1';
+
+  ctx.textAlign = 'center';
+  ctx.font = '600 18px system-ui, sans-serif';
+  ctx.fillText(`Wave ${game.wave}`, game.width / 2, 14);
+  ctx.font = '700 28px system-ui, sans-serif';
+  ctx.fillText(String(Math.ceil(waveTimeLeft(game))), game.width / 2, 36);
+
+  ctx.textAlign = 'left';
+  ctx.font = '600 16px system-ui, sans-serif';
+  ctx.fillText(`Kills: ${game.kills}`, 18, 16);
+
+  ctx.textAlign = 'right';
+  ctx.fillText(`Time: ${formatTime(game.time)}`, game.width - 18, 16);
 }
 
 export function formatTime(seconds) {

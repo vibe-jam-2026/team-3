@@ -30,12 +30,16 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Arena | One box the size of the browser window; players can't leave it |
 | Chain | Physical rope of segments between the players, with a max length. When stretched it pulls the players toward each other |
 | Chain damage | Chain segments touching an enemy deal damage (likely scaled by how fast the segment moves, so swinging hits harder) |
-| Enemies | Walk toward the nearest player; touching a player deals damage |
+| Enemies | Spawn at the arena edge, walk toward the nearest player; touching a player deals damage |
+| Waves | Each wave lasts 30 s; enemies spawn faster and get tougher every wave. After a wave: a menu with a **Continue** button, the arena is cleared and both players heal a little |
+| Health | Each player has their own health; if **either** player dies it's game over (revive mechanics are an open question) |
+
+All tuning numbers live in `js/config.js`. Debug URL options: `?god` (players can't take damage), `?wave=5` (5-second waves) — e.g. `https://vibe-jam-2026.github.io/team-3/?god&wave=5`.
 
 ## Open questions (decide later)
-- **Spawning:** where (edges, off-screen, random), how often, waves vs continuous ramp.
+- **Spawning:** where (now: random point on the edge), groups/formations, boss waves?
 - **Enemy types:** fast/weak, slow/tanky, ranged, ones that can cut or grab the chain?
-- **Health:** separate or shared? Down-and-revive (stand next to partner to revive)? Game over when both are down?
+- **Health:** shared pool instead? Down-and-revive (stand next to partner to revive) instead of instant game over?
 - **Chain tuning:** length, stiffness, can it be extended by upgrades, does it hurt only when taut / only above a speed?
 - **Player attacks:** does each player also auto-attack, or is the chain the only weapon?
 - **Progression:** XP pickups, level-up choices (shared or per player), a timer to survive.
