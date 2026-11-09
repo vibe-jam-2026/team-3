@@ -3,7 +3,7 @@
 // and reports game.status = 'playing' | 'waveComplete' | 'dead'.
 
 import { moveVector } from './input.js';
-import { PLAYER, CHAIN, WAVES, DEBUG, RATS } from './config.js';
+import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE } from './config.js';
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
@@ -29,6 +29,7 @@ export function createGame(width, height) {
     waveKills: 0,
     waveTime: 0,
     spawnTimer: 0,
+    cursedWave: 0,  // set by the "Max All" button: that wave is a flood of unkillable enemies
     ratTimer: 2,    // first rat shows up a little into the wave
     status: 'playing',
     players,
@@ -113,10 +114,11 @@ export function updateGame(game, dt) {
   updateChain(game.chain, a, b, game.width, game.height);
 
   // --- Spawning ---
+  const cursed = game.wave === game.cursedWave;
   game.spawnTimer -= dt;
   while (game.spawnTimer <= 0) {
-    spawnEnemy(game);
-    game.spawnTimer += spawnInterval(game.wave);
+    if (!cursed || game.enemies.length < CURSE.maxEnemies) spawnEnemy(game);
+    game.spawnTimer += cursed ? CURSE.spawnInterval : spawnInterval(game.wave);
   }
 
   // Rats (neutral egg hunters) on their own timer
@@ -134,7 +136,7 @@ export function updateGame(game, dt) {
   // Chain hurts enemies
   chainHits(game.chain, game.enemies, dt, (e, speed, vx, vy) => {
     if (e.hitCooldown > 0 || e.spawnAnim > 0) return;
-    e.hp -= CHAIN.oneHitKill ? e.hp : speed * CHAIN.damagePerSpeed;
+    if (!e.invincible) e.hp -= CHAIN.oneHitKill ? e.hp : speed * CHAIN.damagePerSpeed;
     e.hitCooldown = CHAIN.hitCooldown;
     e.flash = 0.08;
     e.lastHitVx = vx; e.lastHitVy = vy;

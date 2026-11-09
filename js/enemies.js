@@ -50,6 +50,7 @@ export function spawnEnemy(game, forcedType = null) {
     walk: Math.random() * 10,             // walk-cycle phase
     dead: false,
     neutral: !!def.neutral,
+    invincible: wave === game.cursedWave && !def.neutral, // "Max All" curse
   });
   const e = game.enemies[game.enemies.length - 1];
   if (type === 'rat') {

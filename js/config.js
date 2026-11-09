@@ -64,6 +64,13 @@ export const WAVES = {
   healBetweenWaves: Infinity, // hp restored to each player after a wave (Infinity = full heal)
 };
 
+// The "Max All" gimmick button in the shop secretly means "Max All enemies":
+// the next wave spawns a flood of enemies that can't be killed.
+export const CURSE = {
+  spawnInterval: 0.04, // seconds between spawns (normal wave 1 is 1.1)
+  maxEnemies: 300,     // stop adding more once this many are alive
+};
+
 // Coins dropped by enemies (per tier). The team shares one wallet.
 export const COINS = {
   dropByTier: { 0: 1, 1: 1, 2: 3, 3: 6 }, // tier 0 = rat
