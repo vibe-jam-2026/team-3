@@ -4,12 +4,12 @@
 
 const MASTER_VOLUME = 0.5;
 // Don't spam: at most one sound of each kind per this many seconds
-const MIN_GAP = { cluck: 0.18, crow: 1.2 };
+const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2 };
 
 let ctx = null;
 let master = null;
 let muted = false;
-const lastPlayed = { cluck: -Infinity, crow: -Infinity };
+const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity };
 
 try { muted = localStorage.getItem('tethered-muted') === '1'; } catch { /* storage blocked */ }
 
@@ -59,6 +59,12 @@ export function playCluck() {
 export function playCrow() {
   if (!canPlay('crow')) return;
   crow(ctx, master, ctx.currentTime);
+}
+
+/** The dinosaur boss enters the arena: a big rumbling roar. */
+export function playRoar() {
+  if (!canPlay('roar')) return;
+  roar(ctx, master, ctx.currentTime);
 }
 
 // ---------------------------------------------------------------------------
@@ -128,4 +134,64 @@ export function crow(ac, dest, t) {
   for (const s of parts) {
     syllable(ac, dest, t + s.at, s.dur, s.p, { vol: 0.32, formants: [800, 2000, 3200], vibrato: 12 });
   }
+}
+
+export function roar(ac, dest, t) {
+  const dur = 1.8;
+
+  // Growling voice: two detuned low sawtooths, pitch rising then falling, with a rough wobble
+  const out = ac.createGain();
+  out.gain.setValueAtTime(0.0001, t);
+  out.gain.exponentialRampToValueAtTime(0.3, t + 0.15);
+  out.gain.setValueAtTime(0.3, t + dur * 0.55);
+  out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+  const lp = ac.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.setValueAtTime(500, t);
+  lp.frequency.linearRampToValueAtTime(1400, t + 0.4);
+  lp.frequency.linearRampToValueAtTime(400, t + dur);
+  lp.Q.value = 6;
+  lp.connect(out);
+
+  const wobble = ac.createOscillator();
+  const wobbleGain = ac.createGain();
+  wobble.frequency.value = 22;
+  wobbleGain.gain.value = 18;
+  wobble.connect(wobbleGain);
+
+  for (const detune of [0, 7]) {
+    const o = ac.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(70 + detune, t);
+    o.frequency.linearRampToValueAtTime(140 + detune, t + 0.35);
+    o.frequency.linearRampToValueAtTime(95 + detune, t + 1.1);
+    o.frequency.linearRampToValueAtTime(55 + detune, t + dur);
+    wobbleGain.connect(o.frequency);
+    o.connect(lp);
+    o.start(t);
+    o.stop(t + dur + 0.05);
+  }
+  wobble.start(t);
+  wobble.stop(t + dur + 0.05);
+
+  // Breathy noise layer
+  const len = Math.ceil(ac.sampleRate * dur);
+  const buf = ac.createBuffer(1, len, ac.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+  const noise = ac.createBufferSource();
+  noise.buffer = buf;
+  const bp = ac.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 700;
+  bp.Q.value = 0.8;
+  const ng = ac.createGain();
+  ng.gain.setValueAtTime(0.0001, t);
+  ng.gain.exponentialRampToValueAtTime(0.25, t + 0.2);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  noise.connect(bp).connect(ng).connect(out);
+  noise.start(t);
+
+  out.connect(dest);
 }

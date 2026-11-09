@@ -6,6 +6,7 @@ import { drawEgg, makeSpeckles } from './egg.js';
 import { drawChicken } from './chicken.js';
 import { playCluck, playCrow } from './audio.js';
 import { updateRat, drawRat } from './rat.js';
+import { updateBoss, drawBoss } from './boss.js';
 
 /** Pick which kind of enemy to spawn this wave. */
 function pickType(wave) {
@@ -77,8 +78,9 @@ export function updateEnemies(game, dt) {
     e.spawnAnim = Math.max(0, e.spawnAnim - dt);
 
     // Rats hunt eggs; everything else chases the nearest player
-    const target = e.type === 'rat' ? null : nearest(game.players, e);
+    const target = e.type === 'rat' || e.boss ? null : nearest(game.players, e);
     if (e.type === 'rat' && e.spawnAnim <= 0) updateRat(game, e, dt);
+    if (e.boss && e.spawnAnim <= 0) updateBoss(game, e, dt);
     if (target) {
       const dx = target.x - e.x;
       const dy = target.y - e.y;
@@ -106,10 +108,12 @@ export function updateEnemies(game, dt) {
       const dSq = dx * dx + dy * dy;
       if (dSq >= min * min || dSq === 0) continue;
       const d = Math.sqrt(dSq);
-      const push = (min - d) / 2;
       const nx = dx / d, ny = dy / d;
-      a.x -= nx * push; a.y -= ny * push;
-      b.x += nx * push; b.y += ny * push;
+      // The boss is too heavy to be pushed: it shoves the others out of the way
+      const wa = a.boss ? 0 : b.boss ? 1 : 0.5;
+      const wb = b.boss ? 0 : a.boss ? 1 : 0.5;
+      a.x -= nx * (min - d) * wa; a.y -= ny * (min - d) * wa;
+      b.x += nx * (min - d) * wb; b.y += ny * (min - d) * wb;
     }
   }
 
@@ -144,7 +148,8 @@ export function drawEnemies(ctx, enemies) {
     const appear = 1 - e.spawnAnim / 0.4;           // 0 -> 1 while spawning
     ctx.globalAlpha = 0.3 + 0.7 * appear;
     const scale = 0.5 + 0.5 * appear;
-    if (e.type === 'rat') drawRat(ctx, e, scale);
+    if (e.boss) drawBoss(ctx, e, scale);
+    else if (e.type === 'rat') drawRat(ctx, e, scale);
     else if (e.type === 'egg') drawEgg(ctx, e.x, e.y, e.r, e.roll, e.speckles, e.flash > 0, scale);
     else drawChicken(ctx, e, e.type === 'rooster', scale);
     ctx.globalAlpha = 1;
