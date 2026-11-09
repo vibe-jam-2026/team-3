@@ -33,9 +33,9 @@ the players survive by moving, and by using the chain itself as a weapon.
 ## Rules — v1 (decided)
 | Topic | v1 decision |
 |---|---|
-| Players | 2, local, same keyboard. Together they are **one two-headed worm**: each player controls a worm head, and the chain between them is the worm's body |
+| Players | 2, local, same keyboard. Together they are **one two-headed worm**: each player controls a worm head (wearing a **space helmet**), and the chain between them is the worm's body |
 | Controls | P1: `W A S D` · P2: arrow keys (gamepads later) |
-| Arena | One box the size of the browser window; players can't leave it |
+| Arena | One box the size of the browser window, set **in space** (stars, nebulas, planets); players can't leave it |
 | Chain | Physical rope of segments between the players, with a max length. When stretched it pulls the players toward each other |
 | Chain damage | A swinging chain (moving faster than a minimum speed) hits enemies it touches. Hits to kill: **egg 1, chicken 2, rooster 3, rat 1, dino boss 5** |
 | Enemies | Three tiers, all chase the nearest player and hurt on touch (no special abilities yet). **Tier 1 egg**: small, rolls, cracks open when killed. **Tier 2 chicken**: bigger, hits harder, bursts into feathers. **Tier 3 rooster**: biggest, hits hardest. Chickens appear from wave 2, roosters from wave 3, more of them each wave |

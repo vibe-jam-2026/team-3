@@ -4,6 +4,7 @@ import { wasPressed, endFrame } from './input.js';
 import {
   createGame, resizeGame, updateGame, drawGame, startNextWave, formatTime, PLAYER_COLORS,
 } from './game.js';
+import { drawSpace } from './space.js';
 import { toggleMute, isMuted } from './audio.js';
 import { UPGRADES, upgradeCost, buyUpgrade } from './upgrades.js';
 
@@ -174,8 +175,7 @@ function draw() {
 
 // ---------- Screens ----------
 function drawTitle() {
-  ctx.fillStyle = '#111318';
-  ctx.fillRect(0, 0, width, height);
+  drawSpace(ctx, width, height);
 
   const cx = width / 2;
   const cy = height / 2;
