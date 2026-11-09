@@ -57,6 +57,7 @@ export function spawnEnemy(game, forcedType = null) {
   });
   const e = game.enemies[game.enemies.length - 1];
   if (type === 'rat') {
+    e.hitsLeft = e.maxHits = game.stats.ratHits; // Rat health upgrade
     e.speed = RATS.speed;
     e.state = 'seek';
     e.eatTimer = 0;

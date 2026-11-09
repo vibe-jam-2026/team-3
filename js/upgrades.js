@@ -37,6 +37,12 @@ export const UPGRADES = [
     desc: (lvl) => `+35 px pickup field (now ${COINS.magnetRadius + 35 * lvl} px)`,
     firstCosts: [1, 2], maxLevel: Infinity,
   },
+  {
+    // Rats eat eggs for you; tougher rats survive your own swings
+    id: 'rats', name: 'Rat health', icon: '🐀',
+    desc: (lvl) => `Rats take +1 hit to kill (now ${1 + lvl})`,
+    firstCosts: [1, 2], maxLevel: Infinity,
+  },
 ];
 
 export function createUpgradeLevels() {
@@ -59,6 +65,7 @@ export function computeStats(levels) {
     speed: PLAYER.speed * (1 + 0.08 * levels.speed),
     enemySpeedMult: 0.93 ** levels.slow,
     magnetRadius: COINS.magnetRadius + 35 * levels.magnet,
+    ratHits: 1 + levels.rats,                // chain hits needed to kill a rat
   };
 }
 
