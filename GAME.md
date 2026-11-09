@@ -33,7 +33,7 @@ the players survive by moving, and by using the chain itself as a weapon.
 ## Rules — v1 (decided)
 | Topic | v1 decision |
 |---|---|
-| Players | 2, local, same keyboard |
+| Players | 2, local, same keyboard. Together they are **one two-headed worm**: each player controls a worm head, and the chain between them is the worm's body |
 | Controls | P1: `W A S D` · P2: arrow keys (gamepads later) |
 | Arena | One box the size of the browser window; players can't leave it |
 | Chain | Physical rope of segments between the players, with a max length. When stretched it pulls the players toward each other |

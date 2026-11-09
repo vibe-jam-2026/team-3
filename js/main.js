@@ -188,7 +188,7 @@ function drawTitle() {
 
   ctx.font = '18px system-ui, sans-serif';
   ctx.fillStyle = '#9a978f';
-  ctx.fillText('Two players. One chain. Swing it through the horde.', cx, cy - 60);
+  ctx.fillText('Two heads. One worm. Swing your body through the horde.', cx, cy - 60);
 
   ctx.font = '600 18px system-ui, sans-serif';
   ctx.fillStyle = PLAYER_COLORS[0];

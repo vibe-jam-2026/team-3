@@ -4,7 +4,8 @@
 
 import { moveVector } from './input.js';
 import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS, ALIEN } from './config.js';
-import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
+import { createChain, springPlayers, constrainPlayers, updateChain, chainHits } from './chain.js';
+import { drawWormBody, drawWormHead } from './worm.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
 import { featherBurst } from './chicken.js';
@@ -110,6 +111,8 @@ export function updateGame(game, dt) {
   // --- Players ---
   for (const p of game.players) {
     const dir = moveVector(p.index);
+    // Remember which way the worm head is facing (for its eyes)
+    if (dir.x || dir.y) { p.lookX = dir.x; p.lookY = dir.y; }
     p.x += dir.x * game.stats.speed * dt;
     p.y += dir.y * game.stats.speed * dt;
     p.invuln = Math.max(0, p.invuln - dt);
@@ -264,28 +267,18 @@ export function drawGame(ctx, game) {
   drawCoins(ctx, game.floorCoins);
   drawBossArrows(ctx, game.enemies, game.width, game.height);
   drawEnemies(ctx, game.enemies);
-  drawChain(ctx, game.chain);
+  drawWormBody(ctx, game.chain); // the chain is the worm's body
   drawAirEffects(ctx, game.effects);
   drawProjectiles(ctx, game.projectiles);
 
-  for (const p of game.players) drawPlayer(ctx, p);
+  const pts = game.chain.points;
+  game.players.forEach((p, i) => drawPlayer(ctx, p, i === 0 ? pts[1] : pts[pts.length - 2]));
 
   drawHud(ctx, game);
 }
 
-function drawPlayer(ctx, p) {
-  // Blink while invulnerable
-  if (p.invuln > 0 && Math.floor(p.invuln * 15) % 2 === 0) ctx.globalAlpha = 0.4;
-  ctx.fillStyle = p.color;
-  ctx.beginPath();
-  ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#111318';
-  ctx.font = 'bold 14px system-ui, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(`P${p.index + 1}`, p.x, p.y + 1);
-  ctx.globalAlpha = 1;
+function drawPlayer(ctx, p, neck) {
+  drawWormHead(ctx, p, neck); // each player is one head of the worm
 
   // Health bar under the player
   const w = 40;
