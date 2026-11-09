@@ -3,7 +3,7 @@
 export const PLAYER = {
   radius: 16,
   speed: 260,          // px per second
-  maxHp: 100,
+  maxHp: 150,          // was 100 (x1.5)
   invulnTime: 0.6,     // seconds of invulnerability after being hit
 };
 
@@ -24,8 +24,9 @@ export const CHAIN = {
 
 export const ENEMY = {
   hpPerWave: 6,        // extra hp per wave (all tiers)
-  baseSpeed: 70,
-  speedPerWave: 7,
+  baseSpeed: 56,       // px/s in wave 1 (was 70, x0.8)
+  speedGrowth: 1.05,   // enemy speed x1.05 every wave
+  damageGrowth: 1.05,  // enemy damage x1.05 every wave
   knockbackFriction: 6, // how quickly knockback wears off
 };
 

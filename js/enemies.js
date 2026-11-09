@@ -35,10 +35,10 @@ export function spawnEnemy(game) {
   game.enemies.push({
     type, tier: def.tier,
     x, y, r,
-    damage: def.damage,
+    damage: def.damage * ENEMY.damageGrowth ** (wave - 1),
     vx: 0, vy: 0,          // knockback velocity
     hp, maxHp: hp,
-    speed: (ENEMY.baseSpeed + ENEMY.speedPerWave * (wave - 1)) * def.speed,
+    speed: ENEMY.baseSpeed * ENEMY.speedGrowth ** (wave - 1) * def.speed,
     hitCooldown: 0,
     flash: 0,
     spawnAnim: 0.4,        // fade-in; harmless while spawning
