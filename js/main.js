@@ -1,12 +1,16 @@
 // Entry point: canvas setup, screen states and the main loop.
 
 import { wasPressed, endFrame } from './input.js';
-import { createGame, resizeGame, updateGame, drawGame, formatTime, PLAYER_COLORS } from './game.js';
+import {
+  createGame, resizeGame, updateGame, drawGame, startNextWave, formatTime, PLAYER_COLORS,
+} from './game.js';
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
-// Screens: 'title' -> 'playing' <-> 'paused', 'playing' -> 'gameover' -> 'playing'
+// Screens: 'title' -> 'playing' <-> 'paused'
+//          'playing' -> 'waveMenu' -> 'playing' (next wave)
+//          'playing' -> 'gameover' -> 'playing' (new game)
 let screen = 'title';
 let game = null;
 let width = 0;
@@ -25,6 +29,32 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
+// ---------- Between-waves menu (HTML, so it has a real clickable button) ----------
+const waveMenu = document.getElementById('wave-menu');
+const waveMenuTitle = document.getElementById('wave-menu-title');
+const waveMenuStats = document.getElementById('wave-menu-stats');
+const continueBtn = document.getElementById('continue-btn');
+
+function showWaveMenu() {
+  screen = 'waveMenu';
+  waveMenuTitle.textContent = `Wave ${game.wave} complete`;
+  waveMenuStats.innerHTML =
+    `Kills this wave: ${game.waveKills}<br>` +
+    `Total kills: ${game.kills} · Time: ${formatTime(game.time)}<br>` +
+    `Both players heal a little before the next wave.`;
+  waveMenu.hidden = false;
+  continueBtn.focus();
+}
+
+function continueToNextWave() {
+  if (screen !== 'waveMenu') return;
+  waveMenu.hidden = true;
+  continueBtn.blur();
+  startNextWave(game);
+  screen = 'playing';
+}
+continueBtn.addEventListener('click', continueToNextWave);
+
 // ---------- Screen logic ----------
 function startGame() {
   game = createGame(width, height);
@@ -38,9 +68,12 @@ function update(dt) {
       break;
     case 'playing':
       if (wasPressed('Escape') || wasPressed('KeyP')) { screen = 'paused'; break; }
-      // Temporary: K ends the run so the game-over screen can be tested. Remove in Phase 3.
-      if (wasPressed('KeyK')) { screen = 'gameover'; break; }
       updateGame(game, dt);
+      if (game.status === 'waveComplete') showWaveMenu();
+      else if (game.status === 'dead') screen = 'gameover';
+      break;
+    case 'waveMenu':
+      if (wasPressed('Enter') || wasPressed('Space')) continueToNextWave();
       break;
     case 'paused':
       if (wasPressed('Escape') || wasPressed('KeyP')) screen = 'playing';
@@ -64,7 +97,11 @@ function draw() {
   if (screen === 'paused') {
     drawOverlay('Paused', ['Press Esc or P to continue']);
   } else if (screen === 'gameover') {
-    drawOverlay('Game over', [`You survived ${formatTime(game.time)}`, 'Press Enter to play again']);
+    drawOverlay('Game over', [
+      `You reached wave ${game.wave} and survived ${formatTime(game.time)}`,
+      `Kills: ${game.kills}`,
+      'Press Enter to play again',
+    ]);
   }
 }
 
@@ -84,7 +121,7 @@ function drawTitle() {
 
   ctx.font = '18px system-ui, sans-serif';
   ctx.fillStyle = '#9a978f';
-  ctx.fillText('Two players. One chain. Survive together.', cx, cy - 60);
+  ctx.fillText('Two players. One chain. Swing it through the horde.', cx, cy - 60);
 
   ctx.font = '600 18px system-ui, sans-serif';
   ctx.fillStyle = PLAYER_COLORS[0];

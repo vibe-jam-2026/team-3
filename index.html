@@ -8,6 +8,16 @@
 </head>
 <body>
   <canvas id="game"></canvas>
+
+  <!-- Between-waves menu (shown by main.js) -->
+  <div id="wave-menu" class="menu" hidden>
+    <div class="panel">
+      <h1 id="wave-menu-title">Wave 1 complete</h1>
+      <p id="wave-menu-stats"></p>
+      <button id="continue-btn" type="button">Continue</button>
+      <p class="hint">or press Enter</p>
+    </div>
+  </div>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
