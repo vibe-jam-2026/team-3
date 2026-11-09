@@ -15,6 +15,23 @@ export function createChain(a, b) {
   return { points, segLength: CHAIN.maxLength / (CHAIN.links - 1) };
 }
 
+/**
+ * Springy feel: once the players are further apart than springStart * maxLength,
+ * gently pull them back toward each other. The pull grows the further they stretch it.
+ */
+export function springPlayers(a, b, dt) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const dist = Math.hypot(dx, dy);
+  const start = CHAIN.maxLength * CHAIN.springStart;
+  if (dist <= start || dist === 0) return;
+  const pull = (dist - start) * CHAIN.springStrength * dt / 2;
+  const nx = dx / dist;
+  const ny = dy / dist;
+  a.x += nx * pull; a.y += ny * pull;
+  b.x -= nx * pull; b.y -= ny * pull;
+}
+
 /** Keep the two players within the chain's max length (each takes half the correction). */
 export function constrainPlayers(a, b) {
   const dx = b.x - a.x;

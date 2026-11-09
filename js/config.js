@@ -11,6 +11,8 @@ export const PLAYER = {
 export const CHAIN = {
   links: 14,           // number of points in the chain (more = smoother, heavier)
   maxLength: 200,      // px; players can't be further apart than this
+  springStart: 0.7,    // spring starts pulling at this fraction of maxLength
+  springStrength: 3,   // how hard the spring pulls players back together (higher = stronger)
   iterations: 10,      // constraint solver passes (more = stiffer)
   damping: 0.97,       // 1 = no friction, lower = chain settles faster
   thickness: 4,        // px, also the hit width
