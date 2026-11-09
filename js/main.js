@@ -41,7 +41,7 @@ function showWaveMenu() {
   waveMenuStats.innerHTML =
     `Kills this wave: ${game.waveKills}<br>` +
     `Total kills: ${game.kills} · Time: ${formatTime(game.time)}<br>` +
-    `Both players heal a little before the next wave.`;
+    `Both players are healed to full for the next wave.`;
   waveMenu.hidden = false;
   continueBtn.focus();
 }
