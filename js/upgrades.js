@@ -1,7 +1,7 @@
 // Upgrades bought between waves with the coins the team collects.
 // Upgrades are shared: they apply to both players (and the chain between them).
 
-import { PLAYER, CHAIN, COINS } from './config.js';
+import { PLAYER, CHAIN, COINS, DEV_START } from './config.js';
 
 // Tune here. Costs follow a Fibonacci sequence from firstCosts: 3, 5, 8, 13, 21, 34, ...
 // maxLevel: Infinity = no cap (set a number to cap an upgrade)
@@ -86,4 +86,26 @@ export function applyStats(game) {
     p.maxHp = game.stats.maxHp;
     p.hp = Math.min(p.hp, p.maxHp);
   }
+}
+
+/**
+ * Dev start (?start=N): give the players roughly the upgrades they'd have by wave N.
+ * Budget = DEV_START.coinsFactor * (N - 1) ^ 1.5 coins (wave 5 ~ 96, wave 10 ~ 324),
+ * spent round-robin on the cheapest next level, so all upgrades end up about even.
+ */
+export function applyDevStartUpgrades(game, startWave) {
+  let budget = Math.round(DEV_START.coinsFactor * (startWave - 1) ** 1.5);
+  for (;;) {
+    let pick = null;
+    let pickCost = Infinity;
+    for (const u of UPGRADES) {
+      const c = upgradeCost(u, game.upgrades[u.id]);
+      if (game.upgrades[u.id] < u.maxLevel && c < pickCost) { pick = u; pickCost = c; }
+    }
+    if (!pick || pickCost > budget) break;
+    budget -= pickCost;
+    game.upgrades[pick.id] += 1;
+  }
+  applyStats(game);
+  for (const p of game.players) p.hp = p.maxHp;
 }

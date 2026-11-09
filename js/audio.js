@@ -4,12 +4,12 @@
 
 const MASTER_VOLUME = 0.5;
 // Don't spam: at most one sound of each kind per this many seconds
-const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2 };
+const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05 };
 
 let ctx = null;
 let master = null;
 let muted = false;
-const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity };
+const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity };
 
 try { muted = localStorage.getItem('tethered-muted') === '1'; } catch { /* storage blocked */ }
 
@@ -59,6 +59,12 @@ export function playCluck() {
 export function playCrow() {
   if (!canPlay('crow')) return;
   crow(ctx, master, ctx.currentTime);
+}
+
+/** The alien fires a shot: "pew". */
+export function playPew() {
+  if (!canPlay('pew')) return;
+  pew(ctx, master, ctx.currentTime);
 }
 
 /** The dinosaur boss enters the arena: a big rumbling roar. */
@@ -194,4 +200,23 @@ export function roar(ac, dest, t) {
   noise.start(t);
 
   out.connect(dest);
+}
+
+export function pew(ac, dest, t) {
+  // A quick laser zap: square wave sweeping down fast, through a gentle low-pass
+  const o = ac.createOscillator();
+  o.type = 'square';
+  const start = 1400 + Math.random() * 300;
+  o.frequency.setValueAtTime(start, t);
+  o.frequency.exponentialRampToValueAtTime(220, t + 0.14);
+  const lp = ac.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 3000;
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.16, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+  o.connect(lp).connect(g).connect(dest);
+  o.start(t);
+  o.stop(t + 0.18);
 }
