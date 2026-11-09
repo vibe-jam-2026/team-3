@@ -57,6 +57,9 @@ export const WAVES = {
 export const COINS = {
   dropByTier: { 1: 1, 2: 3, 3: 6 },
   radius: 7,
+  pickupDelay: 1,      // seconds after dropping before a coin can be collected
+  magnetRadius: 40,    // px beyond the player's edge that pulls coins in (upgradable)
+  magnetSpeed: 260,    // px/s pull speed (faster closer to the player)
 };
 
 // Debug options from the URL, for testing:

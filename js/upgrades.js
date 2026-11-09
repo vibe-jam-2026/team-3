@@ -1,7 +1,7 @@
 // Upgrades bought between waves with the coins the team collects.
 // Upgrades are shared: they apply to both players (and the chain between them).
 
-import { PLAYER, CHAIN } from './config.js';
+import { PLAYER, CHAIN, COINS } from './config.js';
 
 // Tune here. cost = baseCost * costGrowth ^ currentLevel
 export const UPGRADES = [
@@ -30,6 +30,11 @@ export const UPGRADES = [
     desc: (lvl) => `Enemies 7% slower (now −${7 * lvl}%)`,
     baseCost: 14, costGrowth: 1.7, maxLevel: 5,
   },
+  {
+    id: 'magnet', name: 'Coin magnet', icon: '🧲',
+    desc: (lvl) => `+35 px pickup field (now ${COINS.magnetRadius + 35 * lvl} px)`,
+    baseCost: 8, costGrowth: 1.5, maxLevel: 5,
+  },
 ];
 
 export function createUpgradeLevels() {
@@ -48,6 +53,7 @@ export function computeStats(levels) {
     regen: 1 * levels.regen,                 // hp per second
     speed: PLAYER.speed * (1 + 0.08 * levels.speed),
     enemySpeedMult: 1 - 0.07 * levels.slow,
+    magnetRadius: COINS.magnetRadius + 35 * levels.magnet,
   };
 }
 
