@@ -59,7 +59,9 @@ function refreshUpgrades() {
     const lvl = game.upgrades[u.id];
     const maxed = lvl >= u.maxLevel;
     const cost = upgradeCost(u, lvl);
-    const pips = '●'.repeat(lvl) + '○'.repeat(u.maxLevel - lvl);
+    const pips = Number.isFinite(u.maxLevel)
+      ? '●'.repeat(lvl) + '○'.repeat(u.maxLevel - lvl)
+      : `Level ${lvl}`;
     btn.disabled = maxed || game.coins < cost;
     btn.innerHTML =
       `<span class="icon">${u.icon}</span>` +
