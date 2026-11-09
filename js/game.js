@@ -320,6 +320,12 @@ function drawHud(ctx, game) {
 
   ctx.textAlign = 'right';
   ctx.fillText(`Time: ${formatTime(game.time)}`, game.width - 18, 16);
+  if (DEBUG.god) {
+    // Reminder that this is a test run
+    ctx.fillStyle = '#ffd54f';
+    ctx.font = '700 13px system-ui, sans-serif';
+    ctx.fillText('GOD MODE', game.width - 18, 40);
+  }
 
   drawBossBar(ctx, game);
 }

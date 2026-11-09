@@ -131,3 +131,5 @@ Spawn interval by wave (after the 20% boost):
 | `?coins=200` | start with 200 coins |
 
 Any `?start=N` gives upgrades worth `12 × (N − 1)^1.5` coins, spent evenly across all upgrades (cheapest next level first). Combine options, e.g. `?god&start=5&coins=200`.
+
+Boss test links (with god mode): [dino, wave 5](https://vibe-jam-2026.github.io/team-3/?start=5&god) · [alien, wave 10](https://vibe-jam-2026.github.io/team-3/?start=10&god)

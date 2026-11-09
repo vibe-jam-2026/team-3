@@ -2,11 +2,11 @@
 
 **▶ Play it: https://vibe-jam-2026.github.io/team-3/**
 
-**▶ Start at wave 5 (dino boss): https://vibe-jam-2026.github.io/team-3/?start=5**
+**▶ Test the dino boss (wave 5, god mode): https://vibe-jam-2026.github.io/team-3/?start=5&god**
 
-**▶ Start at wave 10 (alien boss): https://vibe-jam-2026.github.io/team-3/?start=10**
+**▶ Test the alien boss (wave 10, god mode): https://vibe-jam-2026.github.io/team-3/?start=10&god**
 
-(The start links give the players upgrades like they'd have by then.)
+(The boss test links give the players upgrades like they'd have by then, and **god mode**: players can't take damage or die. Remove `&god` from the address to test for real.)
 
 All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
