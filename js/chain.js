@@ -129,23 +129,3 @@ export function distToSegmentSq(px, py, ax, ay, bx, by) {
   const cy = ay + aby * t - py;
   return cx * cx + cy * cy;
 }
-
-export function drawChain(ctx, chain) {
-  const pts = chain.points;
-  ctx.strokeStyle = '#c9ced8';
-  ctx.lineWidth = CHAIN.thickness;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-  ctx.stroke();
-
-  // Small "links" so the motion is easy to read
-  ctx.fillStyle = '#8b92a1';
-  for (let i = 1; i < pts.length - 1; i++) {
-    ctx.beginPath();
-    ctx.arc(pts[i].x, pts[i].y, CHAIN.thickness * 0.9, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
