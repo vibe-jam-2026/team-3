@@ -1,5 +1,7 @@
 # Game concept (working title: "Tethered")
 
+**▶ Play it: https://vibe-jam-2026.github.io/team-3/**
+
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
 ## Pitch
