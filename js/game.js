@@ -4,7 +4,7 @@
 
 import { moveVector } from './input.js';
 import { PLAYER, CHAIN, WAVES, DEBUG } from './config.js';
-import { createChain, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
+import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 
 export const PLAYER_COLORS = ['#4fc3f7', '#ffb74d'];
@@ -88,6 +88,7 @@ export function updateGame(game, dt) {
     p.invuln = Math.max(0, p.invuln - dt);
   }
   const [a, b] = game.players;
+  springPlayers(a, b, dt);
   constrainPlayers(a, b);
   for (const p of game.players) clampToArena(game, p);
 
