@@ -60,6 +60,7 @@ export const WAVES = {
   spawnIntervalFactor: 0.82, // each wave multiplies the interval by this
   minSpawnInterval: 0.15,
   healBetweenWaves: Infinity, // hp restored to each player after a wave (Infinity = full heal)
+  spawnRate: 1.2,            // x more enemies than the interval above gives (1.2 = +20%)
 };
 
 // Boss: a big dinosaur every few waves (see boss.js)
@@ -75,6 +76,7 @@ export const BOSS = {
   aimTime: 1,        // seconds the arrow is shown before the charge
   chargeSpeed: 620,  // px/s while charging
   recoverTime: 1.2,  // seconds dazed after hitting a wall
+  enemySpawnRate: 0.25, // while the boss is alive, other enemies spawn at this rate (0.25 = 75% fewer)
 };
 
 // The "Max All" gimmick button in the shop secretly means "Max All enemies":
@@ -87,6 +89,7 @@ export const CURSE = {
 // Coins dropped by enemies (per tier). The team shares one wallet.
 export const COINS = {
   dropByTier: { 0: 1, 1: 1, 2: 3, 3: 6, 4: 25 }, // tier 0 = rat, tier 4 = boss
+  dropRate: 0.8,       // multiplier on the drops above (0.8 = 20% less; fractions are a chance of one more coin)
   radius: 7,
   pickupDelay: 1,      // seconds after dropping before a coin can be collected
   magnetRadius: 40,    // px beyond the player's edge that pulls coins in (upgradable)

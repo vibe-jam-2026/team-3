@@ -6,7 +6,9 @@ import { COINS } from './config.js';
 import { distToSegmentSq } from './chain.js';
 
 export function dropCoins(game, e) {
-  const value = COINS.dropByTier[e.tier] ?? 1;
+  // e.g. 3 coins x 0.8 = 2.4 -> 2 coins, plus a 40% chance of a third
+  const exact = (COINS.dropByTier[e.tier] ?? 1) * COINS.dropRate;
+  const value = Math.floor(exact) + (Math.random() < exact % 1 ? 1 : 0);
   // Coins land on the spot where the enemy died (spread inside its body)
   for (let i = 0; i < value; i++) {
     const a = Math.random() * Math.PI * 2;
