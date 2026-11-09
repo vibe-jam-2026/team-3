@@ -37,7 +37,7 @@ export const WAVES = {
   firstSpawnInterval: 1.1,   // seconds between spawns in wave 1
   spawnIntervalFactor: 0.82, // each wave multiplies the interval by this
   minSpawnInterval: 0.15,
-  healBetweenWaves: 30,      // hp restored to each player after a wave
+  healBetweenWaves: Infinity, // hp restored to each player after a wave (Infinity = full heal)
 };
 
 // Debug options from the URL, for testing:
