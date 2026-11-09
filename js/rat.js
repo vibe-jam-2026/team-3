@@ -21,7 +21,7 @@ export function updateRat(game, e, dt) {
   let egg = null;
   let best = Infinity;
   for (const o of game.enemies) {
-    if (o.type !== 'egg' || o.dead || o.hp <= 0 || o.spawnAnim > 0) continue;
+    if (o.type !== 'egg' || o.dead || o.hp <= 0 || o.spawnAnim > 0 || o.invincible) continue;
     const d = (o.x - e.x) ** 2 + (o.y - e.y) ** 2;
     if (d < best) { best = d; egg = o; }
   }

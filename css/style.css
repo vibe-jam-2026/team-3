@@ -91,3 +91,8 @@ canvas {
 .upgrade .desc { font-size: 12px; color: #a9a59c; min-height: 2.6em; }
 .upgrade .pips { font-size: 11px; letter-spacing: 2px; color: #4fc3f7; }
 .upgrade .cost { font-weight: 700; color: #ffd54f; }
+
+/* "Max All" gimmick: the second line ("enemies") is the same colour as the card */
+.panel button.upgrade.max-all { border-color: #ffd54f; }
+.upgrade .sneaky { color: #2a2f3a; font-weight: 700; line-height: 1; }
+.panel button.upgrade:hover:not(:disabled) .sneaky { color: #343b48; }

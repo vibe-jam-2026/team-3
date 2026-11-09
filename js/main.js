@@ -53,7 +53,28 @@ const upgradeButtons = UPGRADES.map((u, i) => {
   return { u, btn, key: `Digit${i + 1}` };
 });
 
+// The gimmick: looks like "Max All", but the hidden second line says "enemies"
+// (same colour as the card). Clicking it curses the next wave.
+const maxAllBtn = document.createElement('button');
+maxAllBtn.type = 'button';
+maxAllBtn.className = 'upgrade max-all';
+maxAllBtn.addEventListener('mousedown', (e) => e.preventDefault());
+maxAllBtn.addEventListener('click', () => {
+  game.cursedWave = game.wave + 1;
+  refreshUpgrades();
+});
+upgradeList.appendChild(maxAllBtn);
+
 function refreshUpgrades() {
+  const cursed = game.cursedWave === game.wave + 1;
+  maxAllBtn.disabled = cursed;
+  maxAllBtn.innerHTML =
+    `<span class="icon">★</span>` +
+    `<span class="name">Max All</span>` +
+    `<span class="sneaky">enemies</span>` +
+    `<span class="desc">${cursed ? 'Done!' : 'Every upgrade to the max'}</span>` +
+    `<span class="cost">${cursed ? '✓' : 'FREE'}</span>`;
+
   walletAmount.textContent = game.coins;
   for (const { u, btn } of upgradeButtons) {
     const lvl = game.upgrades[u.id];
