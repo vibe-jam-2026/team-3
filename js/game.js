@@ -3,11 +3,12 @@
 // and reports game.status = 'playing' | 'waveComplete' | 'dead'.
 
 import { moveVector } from './input.js';
-import { PLAYER, CHAIN, WAVES, DEBUG } from './config.js';
+import { PLAYER, CHAIN, WAVES, DEBUG, RATS } from './config.js';
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
 import { featherBurst } from './chicken.js';
+import { furBurst } from './rat.js';
 import { dropCoins, updateCoins, drawCoins, drawCoinIcon, drawMagnetFields } from './coins.js';
 import { createUpgradeLevels, applyStats } from './upgrades.js';
 
@@ -28,6 +29,7 @@ export function createGame(width, height) {
     waveKills: 0,
     waveTime: 0,
     spawnTimer: 0,
+    ratTimer: 2,    // first rat shows up a little into the wave
     status: 'playing',
     players,
     chain: createChain(players[0], players[1]),
@@ -61,6 +63,7 @@ export function startNextWave(game) {
   game.waveKills = 0;
   game.waveCoins = 0;
   game.spawnTimer = 0;
+  game.ratTimer = 2;
   game.enemies = [];
   game.floorCoins = []; // uncollected coins are lost
   game.status = 'playing';
@@ -116,6 +119,15 @@ export function updateGame(game, dt) {
     game.spawnTimer += spawnInterval(game.wave);
   }
 
+  // Rats (neutral egg hunters) on their own timer
+  if (game.wave >= RATS.fromWave) {
+    game.ratTimer -= dt;
+    if (game.ratTimer <= 0) {
+      game.ratTimer = RATS.interval;
+      if (game.enemies.filter((e) => e.type === 'rat').length < RATS.maxAlive) spawnEnemy(game, 'rat');
+    }
+  }
+
   // --- Enemies ---
   updateEnemies(game, dt);
 
@@ -132,7 +144,7 @@ export function updateGame(game, dt) {
 
   // Enemies hurt players, and can't walk through them
   for (const e of game.enemies) {
-    if (e.spawnAnim > 0) continue;
+    if (e.spawnAnim > 0 || e.neutral) continue; // rats don't hurt (or block) players
     for (const p of game.players) {
       const dx = e.x - p.x;
       const dy = e.y - p.y;
@@ -152,10 +164,13 @@ export function updateGame(game, dt) {
   for (const e of game.enemies) {
     if (e.hp <= 0 && !e.dead) {
       e.dead = true;
+      if (e.type === 'egg') crackEgg(game.effects, e, e.lastHitVx, e.lastHitVy);
+      else if (e.type === 'rat') furBurst(game.effects, e, e.lastHitVx, e.lastHitVy);
+      else featherBurst(game.effects, e, e.lastHitVx, e.lastHitVy);
+      // An egg eaten by a rat is gone: no kill and no coins for the players
+      if (e.killedBy === 'rat') continue;
       game.kills += 1;
       game.waveKills += 1;
-      if (e.type === 'egg') crackEgg(game.effects, e, e.lastHitVx, e.lastHitVy);
-      else featherBurst(game.effects, e, e.lastHitVx, e.lastHitVy);
       dropCoins(game, e);
     }
   }

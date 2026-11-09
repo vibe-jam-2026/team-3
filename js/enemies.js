@@ -1,10 +1,11 @@
 // Enemies: eggs (tier 1), chickens (tier 2) and roosters (tier 3).
 // They spawn at the arena edge and chase the nearest player.
 
-import { ENEMY, ENEMY_TYPES, TIER_SPAWNS } from './config.js';
+import { ENEMY, ENEMY_TYPES, TIER_SPAWNS, RATS } from './config.js';
 import { drawEgg, makeSpeckles } from './egg.js';
 import { drawChicken } from './chicken.js';
 import { playCluck, playCrow } from './audio.js';
+import { updateRat, drawRat } from './rat.js';
 
 /** Pick which kind of enemy to spawn this wave. */
 function pickType(wave) {
@@ -19,9 +20,9 @@ function pickType(wave) {
   return 'egg';
 }
 
-export function spawnEnemy(game) {
+export function spawnEnemy(game, forcedType = null) {
   const { width, height, wave } = game;
-  const type = pickType(wave);
+  const type = forcedType ?? pickType(wave);
   const def = ENEMY_TYPES[type];
   const r = def.radius;
   // Pick a random point on the arena edge, just inside it
@@ -48,7 +49,16 @@ export function spawnEnemy(game) {
     facing: Math.random() < 0.5 ? -1 : 1, // chickens look left or right
     walk: Math.random() * 10,             // walk-cycle phase
     dead: false,
+    neutral: !!def.neutral,
   });
+  const e = game.enemies[game.enemies.length - 1];
+  if (type === 'rat') {
+    e.speed = RATS.speed;
+    e.state = 'seek';
+    e.eatTimer = 0;
+    e.wanderAngle = Math.random() * Math.PI * 2;
+    e.wanderTimer = 0;
+  }
 
   // Announce the bigger enemies
   if (type === 'chicken') playCluck();
@@ -65,8 +75,9 @@ export function updateEnemies(game, dt) {
     e.flash = Math.max(0, e.flash - dt);
     e.spawnAnim = Math.max(0, e.spawnAnim - dt);
 
-    // Chase nearest player
-    const target = nearest(game.players, e);
+    // Rats hunt eggs; everything else chases the nearest player
+    const target = e.type === 'rat' ? null : nearest(game.players, e);
+    if (e.type === 'rat' && e.spawnAnim <= 0) updateRat(game, e, dt);
     if (target) {
       const dx = target.x - e.x;
       const dy = target.y - e.y;
@@ -132,7 +143,8 @@ export function drawEnemies(ctx, enemies) {
     const appear = 1 - e.spawnAnim / 0.4;           // 0 -> 1 while spawning
     ctx.globalAlpha = 0.3 + 0.7 * appear;
     const scale = 0.5 + 0.5 * appear;
-    if (e.type === 'egg') drawEgg(ctx, e.x, e.y, e.r, e.roll, e.speckles, e.flash > 0, scale);
+    if (e.type === 'rat') drawRat(ctx, e, scale);
+    else if (e.type === 'egg') drawEgg(ctx, e.x, e.y, e.r, e.roll, e.speckles, e.flash > 0, scale);
     else drawChicken(ctx, e, e.type === 'rooster', scale);
     ctx.globalAlpha = 1;
 

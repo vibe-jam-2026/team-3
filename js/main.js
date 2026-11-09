@@ -93,6 +93,7 @@ continueBtn.addEventListener('click', continueToNextWave);
 // ---------- Screen logic ----------
 function startGame() {
   game = createGame(width, height);
+  window.game = game; // handy for debugging: inspect/tweak from the browser console
   screen = 'playing';
 }
 

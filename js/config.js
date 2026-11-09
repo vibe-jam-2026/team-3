@@ -37,6 +37,17 @@ export const ENEMY_TYPES = {
   egg:     { tier: 1, radius: 12, hp: 25, damage: 10, speed: 1 },
   chicken: { tier: 2, radius: 17, hp: 50, damage: 18, speed: 1 },
   rooster: { tier: 3, radius: 22, hp: 90, damage: 28, speed: 1 },
+  // Neutral: never hurts players, hunts eggs instead (see RATS and rat.js)
+  rat:     { tier: 0, radius: 10, hp: 15, damage: 0, speed: 1, neutral: true },
+};
+
+// Rats spawn on their own timer, separate from the waves of hostile enemies.
+export const RATS = {
+  fromWave: 1,
+  interval: 6,     // seconds between rat spawns
+  maxAlive: 4,     // never more than this many rats at once
+  speed: 105,      // px/s when running to an egg (half speed when wandering)
+  eatTime: 2.5,    // seconds a rat sits still eating after cracking an egg
 };
 
 // Which tiers spawn in which wave. Chance = perWave * (wave - fromWave + 1), capped at max.
@@ -55,7 +66,7 @@ export const WAVES = {
 
 // Coins dropped by enemies (per tier). The team shares one wallet.
 export const COINS = {
-  dropByTier: { 1: 1, 2: 3, 3: 6 },
+  dropByTier: { 0: 1, 1: 1, 2: 3, 3: 6 }, // tier 0 = rat
   radius: 7,
   pickupDelay: 1,      // seconds after dropping before a coin can be collected
   magnetRadius: 40,    // px beyond the player's edge that pulls coins in (upgradable)
