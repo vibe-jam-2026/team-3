@@ -32,9 +32,11 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Chain damage | Chain segments touching an enemy deal damage (likely scaled by how fast the segment moves, so swinging hits harder) |
 | Enemies | Three tiers, all chase the nearest player and hurt on touch (no special abilities yet). **Tier 1 egg**: small, rolls, cracks open when killed. **Tier 2 chicken**: bigger, hits harder, bursts into feathers. **Tier 3 rooster**: biggest, hits hardest. Chickens appear from wave 2, roosters from wave 3, more of them each wave |
 | Waves | Each wave lasts 30 s; enemies spawn faster and get tougher every wave. After a wave: a menu with a **Continue** button, the arena is cleared and both players heal to full |
+| Coins | Killed enemies drop coins (egg 1, chicken 3, rooster 6). Either player collects them by running over them; the team shares one wallet. Coins still on the floor when the wave ends are lost |
+| Upgrades | Bought between waves in the shop (click or keys 1–5), shared by both players: **Chain length** (+30 px), **Max health** (+25), **Health regen** (+1 hp/s), **Move speed** (+8%), **Enemy slow** (−7% enemy speed). Each has a max level and gets pricier per level |
 | Health | Each player has their own health; if **either** player dies it's game over (revive mechanics are an open question) |
 
-All tuning numbers live in `js/config.js`. Debug URL options: `?god` (players can't take damage), `?wave=5` (5-second waves), `?start=4` (begin at wave 4) — e.g. `https://vibe-jam-2026.github.io/team-3/?god&wave=5`.
+All tuning numbers live in `js/config.js`. Debug URL options: `?god` (players can't take damage), `?wave=5` (5-second waves), `?start=4` (begin at wave 4), `?coins=200` (start with 200 coins) — e.g. `https://vibe-jam-2026.github.io/team-3/?god&wave=5`.
 
 ## Open questions (decide later)
 - **Spawning:** where (now: random point on the edge), groups/formations, boss waves?
@@ -42,7 +44,7 @@ All tuning numbers live in `js/config.js`. Debug URL options: `?god` (players ca
 - **Health:** shared pool instead? Down-and-revive (stand next to partner to revive) instead of instant game over?
 - **Chain tuning:** length, stiffness, can it be extended by upgrades, does it hurt only when taut / only above a speed?
 - **Player attacks:** does each player also auto-attack, or is the chain the only weapon?
-- **Progression:** XP pickups, level-up choices (shared or per player), a timer to survive.
+- **Progression:** more upgrades (pickup magnet, chain damage area, weapons), per-player upgrades?
 - **Scoring:** time survived, kills, high score in `localStorage`.
 - **Art/theme:** who the players are, what the chain is (rope, chain, energy beam…), what the enemies are.
 

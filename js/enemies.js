@@ -66,8 +66,9 @@ export function updateEnemies(game, dt) {
       const dx = target.x - e.x;
       const dy = target.y - e.y;
       const d = Math.hypot(dx, dy) || 1;
-      e.x += (dx / d) * e.speed * dt;
-      e.y += (dy / d) * e.speed * dt;
+      const speed = e.speed * game.stats.enemySpeedMult; // enemy-slow upgrade
+      e.x += (dx / d) * speed * dt;
+      e.y += (dy / d) * speed * dt;
     }
 
     // Knockback

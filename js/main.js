@@ -4,6 +4,7 @@ import { wasPressed, endFrame } from './input.js';
 import {
   createGame, resizeGame, updateGame, drawGame, startNextWave, formatTime, PLAYER_COLORS,
 } from './game.js';
+import { UPGRADES, upgradeCost, buyUpgrade } from './upgrades.js';
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -34,14 +35,47 @@ const waveMenu = document.getElementById('wave-menu');
 const waveMenuTitle = document.getElementById('wave-menu-title');
 const waveMenuStats = document.getElementById('wave-menu-stats');
 const continueBtn = document.getElementById('continue-btn');
+const walletAmount = document.getElementById('wallet-amount');
+const upgradeList = document.getElementById('upgrade-list');
+
+// One button per upgrade, built once
+const upgradeButtons = UPGRADES.map((u, i) => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'upgrade';
+  // Keep focus on Continue when clicking, so Enter still means "continue"
+  btn.addEventListener('mousedown', (e) => e.preventDefault());
+  btn.addEventListener('click', () => {
+    if (buyUpgrade(game, u.id)) refreshUpgrades();
+  });
+  upgradeList.appendChild(btn);
+  return { u, btn, key: `Digit${i + 1}` };
+});
+
+function refreshUpgrades() {
+  walletAmount.textContent = game.coins;
+  for (const { u, btn } of upgradeButtons) {
+    const lvl = game.upgrades[u.id];
+    const maxed = lvl >= u.maxLevel;
+    const cost = upgradeCost(u, lvl);
+    const pips = '●'.repeat(lvl) + '○'.repeat(u.maxLevel - lvl);
+    btn.disabled = maxed || game.coins < cost;
+    btn.innerHTML =
+      `<span class="icon">${u.icon}</span>` +
+      `<span class="name">${u.name}</span>` +
+      `<span class="desc">${u.desc(lvl)}</span>` +
+      `<span class="pips">${pips}</span>` +
+      `<span class="cost">${maxed ? 'MAX' : `<span class="coin"></span> ${cost}`}</span>`;
+  }
+}
 
 function showWaveMenu() {
   screen = 'waveMenu';
   waveMenuTitle.textContent = `Wave ${game.wave} complete`;
   waveMenuStats.innerHTML =
-    `Kills this wave: ${game.waveKills}<br>` +
-    `Total kills: ${game.kills} · Time: ${formatTime(game.time)}<br>` +
+    `Kills: ${game.waveKills} · Coins collected: ${game.waveCoins}<br>` +
     `Both players are healed to full for the next wave.`;
+  refreshUpgrades();
   waveMenu.hidden = false;
   continueBtn.focus();
 }
@@ -72,9 +106,15 @@ function update(dt) {
       if (game.status === 'waveComplete') showWaveMenu();
       else if (game.status === 'dead') screen = 'gameover';
       break;
-    case 'waveMenu':
-      if (wasPressed('Enter') || wasPressed('Space')) continueToNextWave();
+    case 'waveMenu': {
+      for (const { u, key } of upgradeButtons) {
+        if (wasPressed(key) && buyUpgrade(game, u.id)) refreshUpgrades();
+      }
+      // A focused button handles Enter/Space itself (buy or continue)
+      const onButton = document.activeElement instanceof HTMLButtonElement;
+      if (!onButton && (wasPressed('Enter') || wasPressed('Space'))) continueToNextWave();
       break;
+    }
     case 'paused':
       if (wasPressed('Escape') || wasPressed('KeyP')) screen = 'playing';
       break;

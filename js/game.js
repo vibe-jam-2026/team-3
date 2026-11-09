@@ -8,6 +8,8 @@ import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, d
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
 import { featherBurst } from './chicken.js';
+import { dropCoins, updateCoins, drawCoins, drawCoinIcon } from './coins.js';
+import { createUpgradeLevels, applyStats } from './upgrades.js';
 
 export const PLAYER_COLORS = ['#4fc3f7', '#ffb74d'];
 
@@ -30,8 +32,14 @@ export function createGame(width, height) {
     players,
     chain: createChain(players[0], players[1]),
     enemies: [],
-    effects: [],    // cracked shells, yolk splats
+    effects: [],    // cracked shells, yolk splats, feathers
+    coins: DEBUG.startCoins, // the team's shared wallet
+    waveCoins: 0,
+    floorCoins: [], // dropped coins waiting to be picked up
+    upgrades: createUpgradeLevels(),
+    stats: null,
   };
+  applyStats(game);
   return game;
 }
 
@@ -41,6 +49,7 @@ function makePlayer(index, x, y) {
     r: PLAYER.radius,
     color: PLAYER_COLORS[index],
     hp: PLAYER.maxHp,
+    maxHp: PLAYER.maxHp,
     invuln: 0,
   };
 }
@@ -50,11 +59,13 @@ export function startNextWave(game) {
   game.wave += 1;
   game.waveTime = 0;
   game.waveKills = 0;
+  game.waveCoins = 0;
   game.spawnTimer = 0;
   game.enemies = [];
+  game.floorCoins = []; // uncollected coins are lost
   game.status = 'playing';
   for (const p of game.players) {
-    p.hp = Math.min(PLAYER.maxHp, p.hp + WAVES.healBetweenWaves);
+    p.hp = Math.min(p.maxHp, p.hp + WAVES.healBetweenWaves);
     p.invuln = 1; // a moment of safety at the start of the wave
   }
 }
@@ -85,13 +96,14 @@ export function updateGame(game, dt) {
   // --- Players ---
   for (const p of game.players) {
     const dir = moveVector(p.index);
-    p.x += dir.x * PLAYER.speed * dt;
-    p.y += dir.y * PLAYER.speed * dt;
+    p.x += dir.x * game.stats.speed * dt;
+    p.y += dir.y * game.stats.speed * dt;
     p.invuln = Math.max(0, p.invuln - dt);
+    p.hp = Math.min(p.maxHp, p.hp + game.stats.regen * dt);
   }
   const [a, b] = game.players;
-  springPlayers(a, b, dt);
-  constrainPlayers(a, b);
+  springPlayers(a, b, dt, game.chain.maxLength);
+  constrainPlayers(a, b, game.chain.maxLength);
   for (const p of game.players) clampToArena(game, p);
 
   // --- Chain ---
@@ -144,10 +156,12 @@ export function updateGame(game, dt) {
       game.waveKills += 1;
       if (e.type === 'egg') crackEgg(game.effects, e, e.lastHitVx, e.lastHitVy);
       else featherBurst(game.effects, e, e.lastHitVx, e.lastHitVy);
+      dropCoins(game, e);
     }
   }
   game.enemies = game.enemies.filter((e) => !e.dead);
 
+  updateCoins(game, dt);
   game.effects = updateEffects(game.effects, dt);
 
   // --- Win / lose ---
@@ -173,6 +187,7 @@ export function drawGame(ctx, game) {
   ctx.strokeRect(2, 2, game.width - 4, game.height - 4);
 
   drawFloorEffects(ctx, game.effects);
+  drawCoins(ctx, game.floorCoins);
   drawEnemies(ctx, game.enemies);
   drawChain(ctx, game.chain);
   drawAirEffects(ctx, game.effects);
@@ -202,8 +217,8 @@ function drawPlayer(ctx, p) {
   const y = p.y + p.r + 6;
   ctx.fillStyle = '#2c313c';
   ctx.fillRect(x, y, w, 5);
-  ctx.fillStyle = p.hp > 30 ? '#66bb6a' : '#ef5350';
-  ctx.fillRect(x, y, w * (p.hp / PLAYER.maxHp), 5);
+  ctx.fillStyle = p.hp > p.maxHp * 0.3 ? '#66bb6a' : '#ef5350';
+  ctx.fillRect(x, y, w * (p.hp / p.maxHp), 5);
 }
 
 function drawHud(ctx, game) {
@@ -219,6 +234,12 @@ function drawHud(ctx, game) {
   ctx.textAlign = 'left';
   ctx.font = '600 16px system-ui, sans-serif';
   ctx.fillText(`Kills: ${game.kills}`, 18, 16);
+  drawCoinIcon(ctx, 26, 50, 7);
+  ctx.fillStyle = '#ffd54f';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(String(game.coins), 40, 51);
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#e8e6e1';
 
   ctx.textAlign = 'right';
   ctx.fillText(`Time: ${formatTime(game.time)}`, game.width - 18, 16);

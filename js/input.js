@@ -14,7 +14,8 @@ const BLOCK_DEFAULT = new Set([
 ]);
 
 window.addEventListener('keydown', (e) => {
-  if (BLOCK_DEFAULT.has(e.code)) e.preventDefault(); // stop page scrolling
+  // Stop page scrolling — but let Space/Enter still press a focused menu button
+  if (BLOCK_DEFAULT.has(e.code) && !(e.target instanceof HTMLButtonElement)) e.preventDefault();
   if (!held.has(e.code)) pressedThisFrame.add(e.code);
   held.add(e.code);
 });

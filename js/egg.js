@@ -2,6 +2,7 @@
 // Also draws the shared effects list (chicken feathers come from chicken.js).
 
 import { drawFeather } from './chicken.js';
+import { drawCoinPop } from './coins.js';
 
 const SHELL = '#f4ecd8';
 const SHELL_SHADE = '#d9cdb0';
@@ -186,7 +187,9 @@ export function drawAirEffects(ctx, effects) {
     ctx.translate(f.x, f.y);
     ctx.rotate(f.angle);
 
-    if (f.kind === 'feather') {
+    if (f.kind === 'coinpop') {
+      drawCoinPop(ctx, f);
+    } else if (f.kind === 'feather') {
       drawFeather(ctx, f);
     } else if (f.kind === 'puff') {
       const t = 1 - f.life / f.maxLife;
