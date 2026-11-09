@@ -4,6 +4,7 @@ import { wasPressed, endFrame } from './input.js';
 import {
   createGame, resizeGame, updateGame, drawGame, startNextWave, formatTime, PLAYER_COLORS,
 } from './game.js';
+import { toggleMute, isMuted } from './audio.js';
 import { UPGRADES, upgradeCost, buyUpgrade } from './upgrades.js';
 
 const canvas = document.getElementById('game');
@@ -96,6 +97,8 @@ function startGame() {
 }
 
 function update(dt) {
+  // Sound on/off works on every screen
+  if (wasPressed('KeyM')) toggleMute();
   switch (screen) {
     case 'title':
       if (wasPressed('Enter') || wasPressed('Space')) startGame();
@@ -178,7 +181,7 @@ function drawTitle() {
 
   ctx.font = '14px system-ui, sans-serif';
   ctx.fillStyle = '#6b675f';
-  ctx.fillText('Esc / P: pause', cx, height - 30);
+  ctx.fillText(`Esc / P: pause · M: sound ${isMuted() ? 'off' : 'on'}`, cx, height - 30);
 }
 
 function drawOverlay(title, lines) {

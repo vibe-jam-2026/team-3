@@ -36,6 +36,8 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Upgrades | Bought between waves in the shop (click or keys 1–6), shared by both players: **Chain length** (+30 px), **Max health** (+25), **Health regen** (+1 hp/s), **Move speed** (+8%), **Enemy slow** (−7% enemy speed), **Coin magnet** (+35 px field). Each has a max level and gets pricier per level |
 | Health | Each player has their own health; if **either** player dies it's game over (revive mechanics are an open question) |
 
+Sound: chickens cluck and roosters crow when they enter the arena (synthesised in `js/audio.js`, no sound files). **M** toggles sound.
+
 All tuning numbers live in `js/config.js`. Debug URL options: `?god` (players can't take damage), `?wave=5` (5-second waves), `?start=4` (begin at wave 4), `?coins=200` (start with 200 coins) — e.g. `https://vibe-jam-2026.github.io/team-3/?god&wave=5`.
 
 ## Open questions (decide later)
