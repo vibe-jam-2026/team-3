@@ -4,12 +4,12 @@
 
 const MASTER_VOLUME = 0.5;
 // Don't spam: at most one sound of each kind per this many seconds
-const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05 };
+const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4 };
 
 let ctx = null;
 let master = null;
 let muted = false;
-const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity };
+const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity };
 
 try { muted = localStorage.getItem('tethered-muted') === '1'; } catch { /* storage blocked */ }
 
@@ -59,6 +59,12 @@ export function playCluck() {
 export function playCrow() {
   if (!canPlay('crow')) return;
   crow(ctx, master, ctx.currentTime);
+}
+
+/** A rat enters the arena: a couple of high squeaks. */
+export function playSqueak() {
+  if (!canPlay('squeak')) return;
+  squeak(ctx, master, ctx.currentTime);
 }
 
 /** The alien fires a shot: "pew". */
@@ -219,4 +225,31 @@ export function pew(ac, dest, t) {
   o.connect(lp).connect(g).connect(dest);
   o.start(t);
   o.stop(t + 0.18);
+}
+
+export function squeak(ac, dest, t) {
+  // 2-3 tiny chirps: a high sine that bends up then down, with a fast vibrato
+  const n = 2 + (Math.random() < 0.4 ? 1 : 0);
+  const base = 2600 + Math.random() * 700;
+  for (let i = 0; i < n; i++) {
+    const st = t + i * 0.09;
+    const dur = 0.06 + Math.random() * 0.03;
+    const o = ac.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(base * 0.85, st);
+    o.frequency.linearRampToValueAtTime(base * 1.25, st + dur * 0.4);
+    o.frequency.linearRampToValueAtTime(base * 0.95, st + dur);
+    const lfo = ac.createOscillator();
+    const lfoGain = ac.createGain();
+    lfo.frequency.value = 60;
+    lfoGain.gain.value = 120;
+    lfo.connect(lfoGain).connect(o.frequency);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, st);
+    g.gain.exponentialRampToValueAtTime(0.12, st + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, st + dur);
+    o.connect(g).connect(dest);
+    o.start(st); o.stop(st + dur + 0.02);
+    lfo.start(st); lfo.stop(st + dur + 0.02);
+  }
 }

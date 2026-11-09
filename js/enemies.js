@@ -4,7 +4,7 @@
 import { ENEMY, ENEMY_TYPES, TIER_SPAWNS, RATS } from './config.js';
 import { drawEgg, makeSpeckles } from './egg.js';
 import { drawChicken } from './chicken.js';
-import { playCluck, playCrow } from './audio.js';
+import { playCluck, playCrow, playSqueak } from './audio.js';
 import { updateRat, drawRat } from './rat.js';
 import { updateBoss, drawBoss } from './boss.js';
 import { updateAlien, drawAlien } from './alien.js';
@@ -67,6 +67,7 @@ export function spawnEnemy(game, forcedType = null) {
 
   // Announce the bigger enemies
   if (type === 'chicken') playCluck();
+  else if (type === 'rat') playSqueak();
   else if (type === 'rooster') playCrow();
 }
 
