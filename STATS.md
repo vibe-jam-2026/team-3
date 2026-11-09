@@ -121,6 +121,15 @@ Spawn interval by wave (after the 20% boost):
 - Price per level follows Fibonacci, the same for every upgrade: **1, 2, 3, 5, 8, 13, 21, 34, 55, …**
 - The extra **Max All** card is a trap: it makes the next wave a flood of unkillable enemies (one every 0.04 s, up to 300).
 
+## Highscores
+
+| Rule | Value |
+|---|---|
+| Names | two, 3 characters each (A–Z, 0–9) |
+| Ranked by | waves cleared (dying in wave N = N − 1 cleared), then kills, then time |
+| List length | top 10 |
+| Saved | in this browser (localStorage); runs with debug options aren't saved |
+
 ## Debug URL options
 
 | Option | Effect |

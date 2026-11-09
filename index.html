@@ -20,6 +20,33 @@
       <p class="hint">Buy with a click or keys 1–7 · Enter to continue</p>
     </div>
   </div>
+  <!-- Game over: enter names, then the highscore list (shown by main.js) -->
+  <div id="score-menu" class="menu" hidden>
+    <div class="panel">
+      <h1>Game over</h1>
+      <p id="score-summary"></p>
+
+      <form id="name-form" autocomplete="off">
+        <p class="hint-top">Enter your names for the highscore list</p>
+        <div class="names">
+          <label class="p1">P1<input id="name-p1" maxlength="3" spellcheck="false" autocapitalize="characters" placeholder="AAA"></label>
+          <span class="amp">&amp;</span>
+          <label class="p2">P2<input id="name-p2" maxlength="3" spellcheck="false" autocapitalize="characters" placeholder="BBB"></label>
+        </div>
+        <button id="save-score-btn" class="continue" type="submit">Save</button>
+        <button id="skip-score-btn" class="link" type="button">Skip</button>
+      </form>
+
+      <div id="score-list-view" hidden>
+        <h2>Highscores</h2>
+        <ol id="score-list" class="scores"></ol>
+        <p id="score-note" class="hint"></p>
+        <button id="play-again-btn" class="continue" type="button">Play again</button>
+        <p class="hint">or press Enter</p>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
