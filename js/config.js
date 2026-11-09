@@ -65,7 +65,7 @@ export const WAVES = {
 // Boss: a big dinosaur every few waves (see boss.js)
 export const BOSS = {
   everyWaves: 5,     // waves 5, 10, 15, ...
-  spawnAt: 25,       // seconds into the wave
+  spawnAt: 5,        // seconds into the wave (boss waves don't end until it's dead)
   radius: 46,
   hits: 5,           // chain hits needed to kill it
   hitCooldown: 0.3,  // seconds between hits that count
