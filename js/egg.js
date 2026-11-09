@@ -1,4 +1,7 @@
 // Egg enemies: drawing the egg and the "crack" effect when one dies.
+// Also draws the shared effects list (chicken feathers come from chicken.js).
+
+import { drawFeather } from './chicken.js';
 
 const SHELL = '#f4ecd8';
 const SHELL_SHADE = '#d9cdb0';
@@ -130,7 +133,7 @@ export function updateEffects(effects, dt) {
     if (f.kind === 'yolk') continue;
     f.x += f.vx * dt;
     f.y += f.vy * dt;
-    const drag = Math.exp(-5 * dt);
+    const drag = Math.exp(-(f.drag ?? 5) * dt);
     f.vx *= drag; f.vy *= drag;
     f.angle += f.spin * dt;
   }
@@ -183,7 +186,16 @@ export function drawAirEffects(ctx, effects) {
     ctx.translate(f.x, f.y);
     ctx.rotate(f.angle);
 
-    if (f.kind === 'shard') {
+    if (f.kind === 'feather') {
+      drawFeather(ctx, f);
+    } else if (f.kind === 'puff') {
+      const t = 1 - f.life / f.maxLife;
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.5 * (1 - t);
+      ctx.beginPath();
+      ctx.arc(0, 0, f.r * (0.8 + t * 1.2), 0, Math.PI * 2);
+      ctx.fill();
+    } else if (f.kind === 'shard') {
       ctx.fillStyle = SHELL;
       ctx.beginPath();
       ctx.moveTo(-f.size, -f.size * 0.6);

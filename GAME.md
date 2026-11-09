@@ -30,11 +30,11 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Arena | One box the size of the browser window; players can't leave it |
 | Chain | Physical rope of segments between the players, with a max length. When stretched it pulls the players toward each other |
 | Chain damage | Chain segments touching an enemy deal damage (likely scaled by how fast the segment moves, so swinging hits harder) |
-| Enemies | Basic enemy: a **rolling egg** that cracks open (shell halves + yolk splat) when killed. Spawns at the arena edge, walk toward the nearest player; touching a player deals damage |
+| Enemies | Three tiers, all chase the nearest player and hurt on touch (no special abilities yet). **Tier 1 egg**: small, rolls, cracks open when killed. **Tier 2 chicken**: bigger, hits harder, bursts into feathers. **Tier 3 rooster**: biggest, hits hardest. Chickens appear from wave 2, roosters from wave 3, more of them each wave |
 | Waves | Each wave lasts 30 s; enemies spawn faster and get tougher every wave. After a wave: a menu with a **Continue** button, the arena is cleared and both players heal to full |
 | Health | Each player has their own health; if **either** player dies it's game over (revive mechanics are an open question) |
 
-All tuning numbers live in `js/config.js`. Debug URL options: `?god` (players can't take damage), `?wave=5` (5-second waves) — e.g. `https://vibe-jam-2026.github.io/team-3/?god&wave=5`.
+All tuning numbers live in `js/config.js`. Debug URL options: `?god` (players can't take damage), `?wave=5` (5-second waves), `?start=4` (begin at wave 4) — e.g. `https://vibe-jam-2026.github.io/team-3/?god&wave=5`.
 
 ## Open questions (decide later)
 - **Spawning:** where (now: random point on the edge), groups/formations, boss waves?

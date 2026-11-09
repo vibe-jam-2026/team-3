@@ -7,6 +7,7 @@ import { PLAYER, CHAIN, WAVES, DEBUG } from './config.js';
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits, drawChain } from './chain.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
+import { featherBurst } from './chicken.js';
 
 export const PLAYER_COLORS = ['#4fc3f7', '#ffb74d'];
 
@@ -21,7 +22,7 @@ export function createGame(width, height) {
     height,
     time: 0,        // total time survived
     kills: 0,
-    wave: 1,
+    wave: DEBUG.startWave,
     waveKills: 0,
     waveTime: 0,
     spawnTimer: 0,
@@ -129,7 +130,7 @@ export function updateGame(game, dt) {
       e.x = p.x + (dx / d) * min;
       e.y = p.y + (dy / d) * min;
       if (p.invuln <= 0 && !DEBUG.god) {
-        p.hp = Math.max(0, p.hp - PLAYER.hitDamage);
+        p.hp = Math.max(0, p.hp - e.damage);
         p.invuln = PLAYER.invulnTime;
       }
     }
@@ -141,7 +142,8 @@ export function updateGame(game, dt) {
       e.dead = true;
       game.kills += 1;
       game.waveKills += 1;
-      crackEgg(game.effects, e, e.lastHitVx, e.lastHitVy);
+      if (e.type === 'egg') crackEgg(game.effects, e, e.lastHitVx, e.lastHitVy);
+      else featherBurst(game.effects, e, e.lastHitVx, e.lastHitVy);
     }
   }
   game.enemies = game.enemies.filter((e) => !e.dead);
