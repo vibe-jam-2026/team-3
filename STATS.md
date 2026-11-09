@@ -117,7 +117,7 @@ Spawn interval by wave (after the 20% boost):
 | 6 | Coin magnet | +35 px field |
 
 - No level cap.
-- Price per level follows Fibonacci, the same for every upgrade: **3, 5, 8, 13, 21, 34, 55, 89, …**
+- Price per level follows Fibonacci, the same for every upgrade: **1, 2, 3, 5, 8, 13, 21, 34, 55, …**
 - The extra **Max All** card is a trap: it makes the next wave a flood of unkillable enemies (one every 0.04 s, up to 300).
 
 ## Debug URL options
@@ -126,8 +126,8 @@ Spawn interval by wave (after the 20% boost):
 |---|---|
 | `?god` | players can't take damage |
 | `?wave=5` | waves last 5 s |
-| `?start=5` | begin at wave 5, with upgrades worth ≈ 96 coins (every upgrade level 3) |
-| `?start=10` | begin at wave 10, with upgrades worth ≈ 324 coins (every upgrade level 5) |
+| `?start=5` | begin at wave 5, with upgrades worth ≈ 96 coins (three upgrades level 5, three level 4) |
+| `?start=10` | begin at wave 10, with upgrades worth ≈ 324 coins (every upgrade level 7) |
 | `?coins=200` | start with 200 coins |
 
 Any `?start=N` gives upgrades worth `12 × (N − 1)^1.5` coins, spent evenly across all upgrades (cheapest next level first). Combine options, e.g. `?god&start=5&coins=200`.
