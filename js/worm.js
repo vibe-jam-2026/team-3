@@ -70,8 +70,9 @@ export function drawWormBody(ctx, chain) {
 }
 
 /**
- * One worm head. p.lookX/p.lookY is the direction it last moved in (eyes look that way).
- * A collar in the player's colour and a small number tell the two heads apart.
+ * One worm head in a space helmet. p.lookX/p.lookY is the direction it last moved in
+ * (eyes look that way). The helmet's rim is in the player's colour, and a small
+ * number above tells the two heads apart.
  */
 export function drawWormHead(ctx, p, neck) {
   const r = p.r;
@@ -86,17 +87,8 @@ export function drawWormHead(ctx, p, neck) {
   ctx.ellipse(p.x + 2, p.y + r * 0.85, r * 0.9, r * 0.35, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Collar in the player's colour, on the neck side (toward the body)
-  const nx = neck.x - p.x;
-  const ny = neck.y - p.y;
-  const nd = Math.hypot(nx, ny) || 1;
-  ctx.strokeStyle = p.color;
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  const ca = Math.atan2(ny, nx);
-  ctx.arc(p.x, p.y, r - 2, ca - 1.1, ca + 1.1);
-  ctx.stroke();
+  // Which side the body (neck) is on
+  const ca = Math.atan2(neck.y - p.y, neck.x - p.x);
 
   // Head
   ctx.fillStyle = SKIN;
@@ -141,12 +133,52 @@ export function drawWormHead(ctx, p, neck) {
   ctx.arc(mx, my, r * 0.18, ma - 0.9, ma + 0.9);
   ctx.stroke();
 
+  drawHelmet(ctx, p, ca);
+
   ctx.globalAlpha = 1;
 
-  // Player number above the head, in the player's colour
+  // Player number above the helmet, in the player's colour
   ctx.fillStyle = p.color;
   ctx.font = 'bold 12px system-ui, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'bottom';
-  ctx.fillText(`P${p.index + 1}`, p.x, p.y - r - 2);
+  ctx.fillText(`P${p.index + 1}`, p.x, p.y - r - 7);
+}
+
+/** Glass space-helmet bubble with a metal rim (in the player's colour) at the neck. */
+function drawHelmet(ctx, p, neckAngle) {
+  const R = p.r + 4;
+
+  // Glass
+  ctx.fillStyle = 'rgba(170, 215, 255, 0.14)';
+  ctx.strokeStyle = 'rgba(210, 235, 255, 0.75)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, R, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Reflections
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, R - 4, Math.PI * 1.08, Math.PI * 1.42);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+  ctx.beginPath();
+  ctx.arc(p.x + R * 0.42, p.y - R * 0.5, 1.8, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Metal rim where the helmet meets the body
+  ctx.strokeStyle = '#8f9aab';
+  ctx.lineWidth = 7;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, R, neckAngle - 0.75, neckAngle + 0.75);
+  ctx.stroke();
+  ctx.strokeStyle = p.color;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, R, neckAngle - 0.7, neckAngle + 0.7);
+  ctx.stroke();
 }

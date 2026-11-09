@@ -6,6 +6,7 @@ import { moveVector } from './input.js';
 import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS, ALIEN } from './config.js';
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits } from './chain.js';
 import { drawWormBody, drawWormHead } from './worm.js';
+import { drawSpace } from './space.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
 import { featherBurst } from './chicken.js';
@@ -255,10 +256,9 @@ function clampToArena(game, p) {
 
 // ---------- Drawing ----------
 export function drawGame(ctx, game) {
-  // Arena
-  ctx.fillStyle = '#1a1d24';
-  ctx.fillRect(0, 0, game.width, game.height);
-  ctx.strokeStyle = '#2c313c';
+  // Arena: open space with stars and planets
+  drawSpace(ctx, game.width, game.height);
+  ctx.strokeStyle = 'rgba(140, 160, 220, 0.35)';
   ctx.lineWidth = 4;
   ctx.strokeRect(2, 2, game.width - 4, game.height - 4);
 
