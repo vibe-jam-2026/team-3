@@ -105,6 +105,15 @@ export const DEV_START = {
   coinsFactor: 12,
 };
 
+// Wormhole to the other dimension (see wormhole.js)
+export const WORMHOLE = {
+  chance: 0.25,     // chance per normal wave that a wormhole opens (never on boss waves)
+  appearMin: 5,     // it opens at a random time between these (seconds into the wave)
+  appearMax: 15,
+  duration: 10,     // seconds it stays open
+  radius: 34,       // px
+};
+
 // The "Max All" gimmick button in the shop secretly means "Max All enemies":
 // the next wave spawns a flood of enemies that can't be killed.
 export const CURSE = {
@@ -128,10 +137,12 @@ export const COINS = {
 //   ?wave=5       waves last 5 seconds instead of WAVES.duration
 //   ?start=4      begin at wave 4 (to test later waves and enemy tiers)
 //   ?coins=200    start with 200 coins (to test upgrades)
+//   ?wormhole     a wormhole opens 2 s into every normal wave
 const params = new URLSearchParams(window.location.search);
 export const DEBUG = {
   god: params.has('god'),
   startWave: Math.max(1, Math.floor(Number(params.get('start')) || 1)),
   startCoins: Math.max(0, Math.floor(Number(params.get('coins')) || 0)),
+  wormhole: params.has('wormhole'),
 };
 if (params.has('wave')) WAVES.duration = Number(params.get('wave')) || WAVES.duration;

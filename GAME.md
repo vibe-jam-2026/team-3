@@ -10,7 +10,9 @@
 
 All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
-Current version: **1.04** (shown in the bottom-right corner of the game)
+Images and videos: **[media/](media/README.md)** (with a guide to uploading them)
+
+Current version: **1.05** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
@@ -48,6 +50,7 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Coins | Killed enemies drop coins on the spot (on average in wave 1: egg 0.8, chicken 2.4, rooster 4.8, boss 20; **×1.2 more every wave**). After 1 s they can be collected: by touching a player, by touching the **chain**, or by being pulled in by each player's small **magnet field**. The team shares one wallet. Coins still on the floor when the wave ends are lost |
 | Upgrades | Bought between waves in the shop (click or keys 1–7), shared by both players: **Chain length** (+30 px), **Max health** (+25), **Health regen** (+1 hp/s), **Move speed** (+8%), **Enemy slow** (−7% enemy speed), **Coin magnet** (+35 px field), **Rat health** (rats take +1 hit to kill). No level cap; prices follow Fibonacci: 1, 2, 3, 5, 8, 13, 21, ... |
 | Highscores | After game over both players enter a **3-character name** each; the run goes on a **top-10 list** ranked by **highest wave cleared** (then kills, then time). The best run is shown on the title screen. Saved in the browser (localStorage), so the list belongs to the computer you play on. Test runs with debug options aren't saved |
+| Wormhole | In each normal (non-boss) wave there's a **25% chance** a swirling **wormhole** opens 5–15 s in and stays for 10 s. If a worm head touches it, the worm goes to the **other dimension**: a greenish sky with different planets, and enemies in different colours. The enemies left behind stay behind. The worm stays there until another wormhole takes it back |
 | Secret | The shop has a free **Max All** card. Its second line, written in the same colour as the card, says *enemies*: the next wave becomes a flood (up to 300) of enemies that can't be killed |
 | Health | Each player has their own health; if **either** player dies it's game over (revive mechanics are an open question) |
 
