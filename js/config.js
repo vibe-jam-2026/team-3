@@ -119,7 +119,7 @@ export const POWERS = {
   beamDuration: 2.5,    // seconds both heads fire
   beamWidth: 70,        // px
   beamCooldown: 12,     // seconds before the beam can be used again
-  meteorFallTime: 1.1,  // seconds from the shout to the impact
+  meteorFallTime: 1.5,  // seconds from the shout to the impact (was 1.1: more build-up)
   meteorCooldown: 30,   // seconds before another meteor
   meteorBossHits: 2,    // hits a boss loses from a meteor (other enemies just die)
 };
