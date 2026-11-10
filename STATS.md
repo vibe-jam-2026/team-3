@@ -134,6 +134,21 @@ Spawn interval by wave (after the 20% boost):
 | Going through | switches dimension, removes the enemies and alien shots left behind, 1 s of safety for the worm |
 | Other dimension | greenish sky, different planets, enemies in shifted colours; stats are the same |
 
+## Voice powers
+
+| | Beam | Meteor |
+|---|---|---|
+| Voice keyword | "beam" (also heard as "laser") | "meteor" |
+| Keyboard fallback | B | K |
+| Effect | both heads fire a 70 px wide beam the way they face, across the whole arena | impact after 1.1 s: every non-boss enemy dies, all alien shots vanish |
+| Duration | 2.5 s | – |
+| Against bosses | 1 hit every 0.3 s while in the beam | −2 hits |
+| Cooldown | 12 s | 30 s |
+| Rats | spared | spared |
+
+- **V** turns voice control on/off (asks for microphone permission). Works in Chrome and Edge; Firefox has no speech recognition.
+- Kills from powers count as kills and drop coins.
+
 ## Highscores
 
 | Rule | Value |
