@@ -10,7 +10,7 @@ import { DEBUG } from './config.js';
 import { VERSION } from './version.js';
 import { toggleMute, isMuted } from './audio.js';
 import { startMusic, toggleMusic, isMusicOn } from './music.js';
-import { toggleVoice, onKeyword } from './voice.js';
+import { onKeyword } from './voice.js';
 import { usePower } from './powers.js';
 
 // Shouted keywords only work while playing
@@ -234,16 +234,12 @@ function update(dt) {
   // Sound on/off works on every screen
   if (wasPressed('KeyM')) toggleMute();
   if (wasPressed('KeyN')) toggleMusic();
-  if (wasPressed('KeyV')) toggleVoice();
   switch (screen) {
     case 'title':
       if (wasPressed('Enter') || wasPressed('Space')) startGame();
       break;
     case 'playing':
       if (wasPressed('Escape') || wasPressed('KeyP')) { screen = 'paused'; break; }
-      // Keyboard fallback for the voice powers
-      if (wasPressed('KeyB')) usePower(game, 'beam');
-      if (wasPressed('KeyK')) usePower(game, 'meteor');
       updateGame(game, dt);
       if (game.status === 'waveComplete') showWaveMenu();
       else if (game.status === 'dead') showGameOver();
@@ -354,7 +350,7 @@ function drawTitle() {
 
   ctx.font = '14px system-ui, sans-serif';
   ctx.fillStyle = '#a79fb8';
-  ctx.fillText(`Esc / P: pause · M: sound ${isMuted() ? 'off' : 'on'} · N: music ${isMusicOn() ? 'on' : 'off'} · V: voice powers`, cx, height - 30);
+  ctx.fillText(`Esc / P: pause · M: sound ${isMuted() ? 'off' : 'on'} · N: music ${isMusicOn() ? 'on' : 'off'} · V: voice on/off`, cx, height - 30);
   ctx.globalAlpha = 1;
   ctx.shadowBlur = 0;
   ctx.shadowColor = 'transparent';

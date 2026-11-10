@@ -379,33 +379,39 @@ function drawPowersHud(ctx, game) {
   ctx.textBaseline = 'bottom';
   ctx.font = '600 13px system-ui, sans-serif';
 
-  const pill = (label, cd, total, key) => {
+  const pill = (label, cd, total, word) => {
     const ready = cd <= 0;
-    const w = 132;
+    const w = 150;
     ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
     ctx.fillRect(x, y - 18, w, 18);
     ctx.fillStyle = ready ? 'rgba(255, 213, 79, 0.85)' : 'rgba(255, 255, 255, 0.18)';
     ctx.fillRect(x, y - 18, w * (ready ? 1 : 1 - cd / total), 18);
     ctx.fillStyle = ready ? '#1b1b1b' : '#e8e6e1';
-    ctx.fillText(ready ? `${label} ready (${key})` : `${label} ${Math.ceil(cd)}s`, x + 6, y - 3);
+    ctx.fillText(ready ? `Shout "${word}"!` : `${label} ${Math.ceil(cd)}s`, x + 6, y - 3);
     y -= 24;
   };
-  pill('METEOR', P.meteorCd, POWERS.meteorCooldown, 'K');
-  pill('BEAM', P.beamCd, POWERS.beamCooldown, 'B');
+  pill('METEOR', P.meteorCd, POWERS.meteorCooldown, 'METEOR');
+  pill('BEAM', P.beamCd, POWERS.beamCooldown, 'BEAM');
 
   const label = {
-    on: '🎤 Voice ON: shout "BEAM" or "METEOR"',
-    off: '🎤 V: voice control',
-    denied: '🎤 Microphone blocked by the browser',
-    unsupported: '🎤 Voice not supported here (use B / K)',
-    error: '🎤 Voice error (V to retry)',
+    on: '🎤 Listening (V to turn off)',
+    starting: '🎤 Starting microphone… allow it if the browser asks',
+    off: '🎤 Voice off (V to turn on)',
+    denied: '🎤 Microphone blocked: allow it in the address bar, then press V',
+    unsupported: '🎤 This browser has no speech recognition: use Chrome or Edge',
+    network: '🎤 Speech service unreachable (needs internet)',
+    nomic: '🎤 No microphone found',
+    error: '🎤 Voice error (press V twice to retry)',
   }[v.status];
-  ctx.fillStyle = v.status === 'on' ? '#7dffb8' : 'rgba(232, 230, 225, 0.7)';
+  ctx.fillStyle = v.status === 'on' ? '#7dffb8' : '#ffb4a8';
   ctx.fillText(label, x, y);
-  if (v.status === 'on' && v.lastHeard && performance.now() - v.lastHeardAt < 2500) {
-    ctx.fillStyle = 'rgba(232, 230, 225, 0.6)';
+  // What the game heard, so players can see why a word did or didn't count
+  const now = performance.now();
+  if (v.status === 'on' && v.lastHeard && now - v.lastHeardAt < 3000) {
+    ctx.fillStyle = 'rgba(232, 230, 225, 0.65)';
     ctx.font = 'italic 12px system-ui, sans-serif';
-    ctx.fillText(`heard: "${v.lastHeard.slice(-40)}"`, x, y - 17);
+    const hit = v.lastMatch && now - v.lastMatchAt < 1500 ? `  → ${v.lastMatch.toUpperCase()}!` : '';
+    ctx.fillText(`heard: "${v.lastHeard.slice(-40)}"${hit}`, x, y - 17);
   }
 }
 

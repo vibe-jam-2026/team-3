@@ -138,15 +138,16 @@ Spawn interval by wave (after the 20% boost):
 
 | | Beam | Meteor |
 |---|---|---|
-| Voice keyword | "beam" (also heard as "laser") | "meteor" |
-| Keyboard fallback | B | K |
+| Voice keyword | "beam" (also "laser", and near-misses like "bean", "team") | "meteor" (also "meteorite", and near-misses like "meter", "meet your", "media") |
+| Keyboard | none: voice only | none: voice only |
 | Effect | both heads fire a 70 px wide beam the way they face, across the whole arena | impact after 1.1 s: every non-boss enemy dies, all alien shots vanish |
 | Duration | 2.5 s | – |
 | Against bosses | 1 hit every 0.3 s while in the beam | −2 hits |
 | Cooldown | 12 s | 30 s |
 | Rats | spared | spared |
 
-- **V** turns voice control on/off (asks for microphone permission). Works in Chrome and Edge; Firefox has no speech recognition.
+- Listening starts with the first key press (the browser asks for microphone permission once); **V** turns it off/on and is remembered. Works in Chrome and Edge; Firefox has no speech recognition.
+- The HUD shows what the game heard and whether it counted.
 - Kills from powers count as kills and drop coins.
 
 ## Highscores
