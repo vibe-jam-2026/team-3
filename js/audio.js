@@ -100,8 +100,20 @@ export function playThrow() {
 export function playStampede() {
   if (!canPlay('stampede')) return;
   const t = ctx.currentTime;
-  for (let i = 0; i < 6; i++) meow(ctx, master, t + i * 0.18 + Math.random() * 0.08);
-  for (let i = 0; i < 26; i++) paw(ctx, master, t + i * 0.07 + Math.random() * 0.03);
+  // A whole crowd of cats: about 22 meows over ~2.4 s, from squeaky kittens
+  // (high, short "mrrp!") to big toms (low, long "meeooww"), overlapping
+  for (let i = 0; i < 22; i++) {
+    const kind = Math.random();
+    const opts = kind < 0.3
+      ? { pitch: 1.5 + Math.random() * 0.4, length: 0.35 + Math.random() * 0.15, volume: 0.22 } // kitten
+      : kind < 0.75
+        ? { pitch: 0.9 + Math.random() * 0.3, length: 0.7 + Math.random() * 0.3, volume: 0.26 } // cat
+        : { pitch: 0.62 + Math.random() * 0.15, length: 1.1 + Math.random() * 0.4, volume: 0.3 }; // tomcat yowl
+    meow(ctx, master, t + Math.random() * 2.2, opts);
+  }
+  // Big opening yowl
+  meow(ctx, master, t, { pitch: 0.75, length: 1.4, volume: 0.4 });
+  for (let i = 0; i < 34; i++) paw(ctx, master, t + i * 0.07 + Math.random() * 0.03);
 }
 
 /** The worm goes through a wormhole: a swirling whoosh. */
@@ -309,11 +321,12 @@ export function squeak(ac, dest, t) {
   }
 }
 
-export function meow(ac, dest, t) {
+export function meow(ac, dest, t, { pitch = 1, length = 1, volume = 0.45 } = {}) {
   // "mi-aaa-u": a nasal voice whose pitch rises then falls, while two mouth
-  // filters (formants) glide from an "i" through an "a" to an "u"
-  const dur = 0.75;
-  const base = 520 + Math.random() * 80;
+  // filters (formants) glide from an "i" through an "a" to an "u".
+  // pitch/length/volume vary it: small kittens squeak, big toms yowl.
+  const dur = 0.75 * length;
+  const base = (520 + Math.random() * 80) * pitch;
   const o = ac.createOscillator();
   o.type = 'sawtooth';
   o.frequency.setValueAtTime(base, t);
@@ -328,8 +341,8 @@ export function meow(ac, dest, t) {
 
   const env = ac.createGain();
   env.gain.setValueAtTime(0.0001, t);
-  env.gain.exponentialRampToValueAtTime(0.45, t + 0.06);
-  env.gain.setValueAtTime(0.45, t + dur * 0.65);
+  env.gain.exponentialRampToValueAtTime(volume, t + 0.06);
+  env.gain.setValueAtTime(volume, t + dur * 0.65);
   env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
 
   //            "i"          "a"         "u"
