@@ -8,6 +8,9 @@ import { createChain, springPlayers, constrainPlayers, updateChain, chainHits } 
 import { drawWormBody, drawWormHead } from './worm.js';
 import { drawSpace } from './space.js';
 import { rollWormhole, updateWormhole, drawWormhole, drawDimensionFlash } from './wormhole.js';
+import { voiceStatus } from './voice.js';
+import { POWERS } from './config.js';
+import { createPowers, updatePowers, drawCraters, drawBeams, drawMeteor, drawImpactFlash } from './powers.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
 import { featherBurst } from './chicken.js';
@@ -53,6 +56,7 @@ export function createGame(width, height) {
     waveCoins: 0,
     floorCoins: [], // dropped coins waiting to be picked up
     projectiles: [], // alien shots
+    powers: createPowers(), // voice powers: beam + meteor
     upgrades: createUpgradeLevels(),
     stats: null,
   };
@@ -83,6 +87,9 @@ export function startNextWave(game) {
   game.ratTimer = 2;
   game.bossSpawned = false;
   game.enemies = [];
+  game.powers.beamTime = 0;   // powers don't carry over between waves (cooldowns do)
+  game.powers.meteor = null;
+  game.powers.craters = [];
   game.projectiles = [];
   rollWormhole(game, !!bossForWave(game.wave));
   game.floorCoins = []; // uncollected coins are lost
@@ -170,6 +177,7 @@ export function updateGame(game, dt) {
 
   updateProjectiles(game, dt);
   updateWormhole(game, dt);
+  updatePowers(game, dt);
 
   // Chain hurts enemies
   chainHits(game.chain, game.enemies, dt, (e, speed, vx, vy) => {
@@ -274,6 +282,7 @@ export function drawGame(ctx, game) {
   drawMagnetFields(ctx, game);
   drawCoins(ctx, game.floorCoins);
   drawBossArrows(ctx, game.enemies, game.width, game.height);
+  drawCraters(ctx, game);
   drawWormhole(ctx, game);
   // In the other dimension the enemies look a little different (shifted colours)
   if (game.dimension === 1) ctx.filter = 'hue-rotate(150deg) saturate(1.4)';
@@ -286,6 +295,9 @@ export function drawGame(ctx, game) {
   const pts = game.chain.points;
   game.players.forEach((p, i) => drawPlayer(ctx, p, i === 0 ? pts[1] : pts[pts.length - 2]));
 
+  drawBeams(ctx, game);
+  drawMeteor(ctx, game);
+  drawImpactFlash(ctx, game);
   drawDimensionFlash(ctx, game);
   drawHud(ctx, game);
 }
@@ -347,10 +359,51 @@ function drawHud(ctx, game) {
   }
 
   drawBossBar(ctx, game);
+  drawPowersHud(ctx, game);
 }
 
 export function formatTime(seconds) {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+/** Bottom-left: voice status and the two powers' cooldowns. */
+function drawPowersHud(ctx, game) {
+  const P = game.powers;
+  const v = voiceStatus();
+  const x = 18;
+  let y = game.height - 18;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'bottom';
+  ctx.font = '600 13px system-ui, sans-serif';
+
+  const pill = (label, cd, total, key) => {
+    const ready = cd <= 0;
+    const w = 132;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.fillRect(x, y - 18, w, 18);
+    ctx.fillStyle = ready ? 'rgba(255, 213, 79, 0.85)' : 'rgba(255, 255, 255, 0.18)';
+    ctx.fillRect(x, y - 18, w * (ready ? 1 : 1 - cd / total), 18);
+    ctx.fillStyle = ready ? '#1b1b1b' : '#e8e6e1';
+    ctx.fillText(ready ? `${label} ready (${key})` : `${label} ${Math.ceil(cd)}s`, x + 6, y - 3);
+    y -= 24;
+  };
+  pill('METEOR', P.meteorCd, POWERS.meteorCooldown, 'K');
+  pill('BEAM', P.beamCd, POWERS.beamCooldown, 'B');
+
+  const label = {
+    on: '🎤 Voice ON: shout "BEAM" or "METEOR"',
+    off: '🎤 V: voice control',
+    denied: '🎤 Microphone blocked by the browser',
+    unsupported: '🎤 Voice not supported here (use B / K)',
+    error: '🎤 Voice error (V to retry)',
+  }[v.status];
+  ctx.fillStyle = v.status === 'on' ? '#7dffb8' : 'rgba(232, 230, 225, 0.7)';
+  ctx.fillText(label, x, y);
+  if (v.status === 'on' && v.lastHeard && performance.now() - v.lastHeardAt < 2500) {
+    ctx.fillStyle = 'rgba(232, 230, 225, 0.6)';
+    ctx.font = 'italic 12px system-ui, sans-serif';
+    ctx.fillText(`heard: "${v.lastHeard.slice(-40)}"`, x, y - 17);
+  }
 }

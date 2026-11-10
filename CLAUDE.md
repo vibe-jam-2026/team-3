@@ -6,4 +6,4 @@
   **Whenever a value in `js/config.js` or `js/upgrades.js` changes, or an entity/upgrade is added or removed, update `STATS.md` in the same commit.**
 - **Version number** lives in `js/version.js` (shown in the corner of every screen) and the "Current version" line in `GAME.md`. Bump it by 0.01 in every pull request that changes the game (1.00 → 1.01 → 1.02 …), mention it in the PR title/body, and always tell the user the new version number.
 - Work on a `claude/...` branch from the latest `main` and open a pull request; the team merges it.
-- Debug URL options: `?god`, `?wave=N`, `?start=N`, `?coins=N`, `?wormhole`; `window.game` is available in the browser console.
+- Keys besides movement: Esc/P pause, M sound, N music, V voice, B beam, K meteor, 1–7 shop. Debug URL options: `?god`, `?wave=N`, `?start=N`, `?coins=N`, `?wormhole`; `window.game` is available in the browser console.

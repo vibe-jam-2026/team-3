@@ -114,6 +114,26 @@ export const WORMHOLE = {
   radius: 34,       // px
 };
 
+// Voice-activated powers (see powers.js). Keyboard fallback: B = beam, K = meteor.
+export const POWERS = {
+  beamDuration: 2.5,    // seconds both heads fire
+  beamWidth: 70,        // px
+  beamCooldown: 12,     // seconds before the beam can be used again
+  meteorFallTime: 1.1,  // seconds from the shout to the impact
+  meteorCooldown: 30,   // seconds before another meteor
+  meteorBossHits: 2,    // hits a boss loses from a meteor (other enemies just die)
+};
+
+// Voice control (see voice.js). V turns the microphone on/off.
+export const VOICE = {
+  lang: 'en-US',
+  // Any of these words (lower case) triggers the power
+  keywords: {
+    beam: ['beam', 'laser', 'beem', 'been'],
+    meteor: ['meteor', 'meteorite', 'meteors', 'media'],
+  },
+};
+
 // The "Max All" gimmick button in the shop secretly means "Max All enemies":
 // the next wave spawns a flood of enemies that can't be killed.
 export const CURSE = {

@@ -4,12 +4,12 @@
 
 const MASTER_VOLUME = 0.5;
 // Don't spam: at most one sound of each kind per this many seconds
-const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1, whoosh: 0.5 };
+const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1, whoosh: 0.5, beam: 1, fall: 1, boom: 0.5 };
 
 let ctx = null;
 let master = null;
 let muted = false;
-const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity, whoosh: -Infinity };
+const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity, whoosh: -Infinity, beam: -Infinity, fall: -Infinity, boom: -Infinity };
 
 try { muted = localStorage.getItem('tethered-muted') === '1'; } catch { /* storage blocked */ }
 
@@ -64,6 +64,24 @@ export function playCluck() {
 export function playCrow() {
   if (!canPlay('crow')) return;
   crow(ctx, master, ctx.currentTime);
+}
+
+/** The giant laser beam (lasts `dur` seconds). */
+export function playBeam(dur) {
+  if (!canPlay('beam')) return;
+  beam(ctx, master, ctx.currentTime, dur);
+}
+
+/** A meteor whistling down (lands after `dur` seconds). */
+export function playMeteorFall(dur) {
+  if (!canPlay('fall')) return;
+  meteorFall(ctx, master, ctx.currentTime, dur);
+}
+
+/** Meteor impact. */
+export function playBoom() {
+  if (!canPlay('boom')) return;
+  boom(ctx, master, ctx.currentTime);
 }
 
 /** The worm goes through a wormhole: a swirling whoosh. */
@@ -350,4 +368,99 @@ export function whoosh(ac, dest, t) {
   o.connect(og).connect(dest);
   o.start(t); o.stop(t + dur + 0.05);
   lfo.start(t); lfo.stop(t + dur + 0.05);
+}
+
+function noiseSource(ac, dur) {
+  const len = Math.ceil(ac.sampleRate * dur);
+  const buf = ac.createBuffer(1, len, ac.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const src = ac.createBufferSource();
+  src.buffer = buf;
+  return src;
+}
+
+export function beam(ac, dest, t, dur) {
+  // Charge-up whine, then a thick buzzing roar with a fast wobble
+  const out = ac.createGain();
+  out.gain.setValueAtTime(0.0001, t);
+  out.gain.exponentialRampToValueAtTime(0.35, t + 0.12);
+  out.gain.setValueAtTime(0.35, t + dur - 0.3);
+  out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  out.connect(dest);
+  const lp = ac.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 2400;
+  lp.connect(out);
+  const lfo = ac.createOscillator();
+  const lfoGain = ac.createGain();
+  lfo.frequency.value = 30;
+  lfoGain.gain.value = 25;
+  lfo.connect(lfoGain);
+  for (const [type, f0, f1, vol] of [['sawtooth', 300, 110, 0.5], ['square', 600, 221, 0.25], ['sine', 1800, 900, 0.2]]) {
+    const o = ac.createOscillator();
+    o.type = type;
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(f1, t + 0.25);
+    lfoGain.connect(o.frequency);
+    const g = ac.createGain();
+    g.gain.value = vol;
+    o.connect(g).connect(lp);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  const n = noiseSource(ac, dur);
+  const bp = ac.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 1500;
+  const ng = ac.createGain();
+  ng.gain.value = 0.25;
+  n.connect(bp).connect(ng).connect(lp);
+  n.start(t);
+  lfo.start(t); lfo.stop(t + dur + 0.05);
+}
+
+export function meteorFall(ac, dest, t, dur) {
+  // Falling whistle plus a growing rush of air
+  const o = ac.createOscillator();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(1800, t);
+  o.frequency.exponentialRampToValueAtTime(300, t + dur);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.15, t + dur * 0.8);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(dest);
+  o.start(t); o.stop(t + dur + 0.02);
+  const n = noiseSource(ac, dur);
+  const lp = ac.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.setValueAtTime(400, t);
+  lp.frequency.exponentialRampToValueAtTime(3000, t + dur);
+  const ng = ac.createGain();
+  ng.gain.setValueAtTime(0.0001, t);
+  ng.gain.exponentialRampToValueAtTime(0.3, t + dur);
+  n.connect(lp).connect(ng).connect(dest);
+  n.start(t);
+}
+
+export function boom(ac, dest, t) {
+  // Deep thump + crackling rumble
+  const o = ac.createOscillator();
+  o.frequency.setValueAtTime(120, t);
+  o.frequency.exponentialRampToValueAtTime(30, t + 0.8);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.9, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
+  o.connect(g).connect(dest);
+  o.start(t); o.stop(t + 1.25);
+  const n = noiseSource(ac, 1.8);
+  const lp = ac.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.setValueAtTime(3000, t);
+  lp.frequency.exponentialRampToValueAtTime(150, t + 1.6);
+  const ng = ac.createGain();
+  ng.gain.setValueAtTime(0.7, t);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+  n.connect(lp).connect(ng).connect(dest);
+  n.start(t);
 }
