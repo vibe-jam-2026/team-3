@@ -12,7 +12,7 @@ All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
 Images and videos: **[media/](media/README.md)** (with a guide to uploading them)
 
-Current version: **1.10** (shown in the bottom-right corner of the game)
+Current version: **1.11** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
@@ -43,7 +43,7 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Chain | Physical rope of segments between the players, with a max length. When stretched it pulls the players toward each other |
 | Chain damage | A swinging chain (moving faster than a minimum speed) hits enemies it touches. Hits to kill: **egg 1, chicken 2, rooster 3, rat 1, dino boss 5** |
 | Enemies | Three tiers, all chase the nearest player and hurt on touch (no special abilities yet). **Tier 1 egg**: small, rolls, cracks open when killed. **Tier 2 chicken**: bigger, hits harder, bursts into feathers. **Tier 3 rooster**: biggest, hits hardest. Chickens appear from wave 2, roosters from wave 3, more of them each wave |
-| Waves | Each wave lasts 30 s; enemies spawn faster and get tougher every wave. After a wave: a menu with a **Continue** button, the arena is cleared and both players heal to full |
+| Waves | Each wave lasts 30 s; enemies spawn faster and get tougher every wave. After a wave: a menu with a **Continue** button, the arena is cleared, the worm is put back in its starting position and both players heal to full |
 | Boss | Every 5th wave (except every 10th) a **dinosaur** roars into the arena 5 s into the wave, and the wave doesn't end (after the 30 s timer the HUD says *Kill the boss!*) until it's dead. It stomps toward the players, then shows a red arrow for 1 s and charges across the arena in that direction until it hits a wall (then it's dazed briefly). It shoves players aside and hits hard. While it's alive, other enemies spawn 75% less. Takes **5 chain hits** to kill and drops 20 coins |
 | Alien boss | Every 10th wave an **alien space cat** in a flying saucer arrives 5 s in, glides around and fires volleys of green shots (pew pew pew) in the players' general direction. Shots hurt players. The chain bounces shots back: bounced shots turn blue and hurt enemies and the alien. 8 hits to kill; like the dino, the wave lasts until it's dead |
 | Rats | Neutral critters (from wave 1, max 4 at once). They never hurt the players. They run to the nearest egg, crack it in one bite and sit eating it for 2.5 s. Eggs eaten by rats give no kills or coins. The chain kills rats (1 coin) |
