@@ -12,7 +12,7 @@ All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
 Images and videos: **[media/](media/README.md)** (with a guide to uploading them)
 
-Current version: **1.05** (shown in the bottom-right corner of the game)
+Current version: **1.06** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
@@ -55,6 +55,8 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Health | Each player has their own health; if **either** player dies it's game over (revive mechanics are an open question) |
 
 Sound: chickens cluck, roosters crow, rats squeak and the UFO cat says *mjau* when they enter the arena (synthesised in `js/audio.js`, no sound files). **M** toggles sound.
+
+Music: an original jazz-funk groove (drums, slap-style bass, clav stabs and horn hits in Bb, ~104 BPM), inspired by late-60s funk-jazz instrumentals like *The Chicken*, but not a copy of it. Synthesised in `js/music.js`. **N** turns the music on/off; **M** mutes everything.
 
 All tuning numbers live in `js/config.js`. Debug URL options: `?god` (players can't take damage), `?wave=5` (5-second waves), `?start=4` (begin at wave 4), `?coins=200` (start with 200 coins) — e.g. `https://vibe-jam-2026.github.io/team-3/?god&wave=5`.
 
