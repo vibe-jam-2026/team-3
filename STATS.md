@@ -140,7 +140,7 @@ Spawn interval by wave (after the 20% boost):
 |---|---|---|
 | Voice keyword | "beam" (also "laser", and near-misses like "bean", "team") | "meteor" (also "meteorite", and near-misses like "meter", "meet your", "media") |
 | Keyboard | none: voice only | none: voice only |
-| Effect | both heads fire a 70 px wide beam the way they face, across the whole arena | impact after 1.1 s: every non-boss enemy dies, all alien shots vanish |
+| Effect | both heads fire a 70 px wide beam the way they face, across the whole arena | impact after 1.5 s (red sky, INCOMING!, crosshair): every non-boss enemy dies, all alien shots vanish |
 | Duration | 2.5 s | – |
 | Against bosses | 1 hit every 0.3 s while in the beam | −2 hits |
 | Cooldown | 12 s | 30 s |

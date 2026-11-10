@@ -441,9 +441,44 @@ export function meteorFall(ac, dest, t, dur) {
   ng.gain.exponentialRampToValueAtTime(0.3, t + dur);
   n.connect(lp).connect(ng).connect(dest);
   n.start(t);
+  // Deep rumble building up under it
+  const rum = ac.createOscillator();
+  rum.type = 'sawtooth';
+  rum.frequency.setValueAtTime(38, t);
+  rum.frequency.linearRampToValueAtTime(55, t + dur);
+  const rlp = ac.createBiquadFilter();
+  rlp.type = 'lowpass';
+  rlp.frequency.value = 140;
+  const rg = ac.createGain();
+  rg.gain.setValueAtTime(0.0001, t);
+  rg.gain.exponentialRampToValueAtTime(0.5, t + dur);
+  rum.connect(rlp).connect(rg).connect(dest);
+  rum.start(t); rum.stop(t + dur + 0.02);
 }
 
 export function boom(ac, dest, t) {
+  // Sharp crack on top of the thump
+  const crack = noiseSource(ac, 0.25);
+  const hp = ac.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 1500;
+  const cg = ac.createGain();
+  cg.gain.setValueAtTime(0.8, t);
+  cg.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+  crack.connect(hp).connect(cg).connect(dest);
+  crack.start(t);
+  // Falling debris crackle a moment later
+  const deb = noiseSource(ac, 1.2);
+  const bp = ac.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 900;
+  bp.Q.value = 0.7;
+  const dg = ac.createGain();
+  dg.gain.setValueAtTime(0.0001, t + 0.25);
+  dg.gain.exponentialRampToValueAtTime(0.25, t + 0.4);
+  dg.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
+  deb.connect(bp).connect(dg).connect(dest);
+  deb.start(t + 0.25);
   // Deep thump + crackling rumble
   const o = ac.createOscillator();
   o.frequency.setValueAtTime(120, t);

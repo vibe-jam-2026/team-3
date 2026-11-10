@@ -90,6 +90,9 @@ export function startNextWave(game) {
   game.powers.beamTime = 0;   // powers don't carry over between waves (cooldowns do)
   game.powers.meteor = null;
   game.powers.craters = [];
+  game.powers.fx = [];
+  game.powers.rings = [];
+  game.powers.boom = 0;
   game.projectiles = [];
   rollWormhole(game, !!bossForWave(game.wave));
   game.floorCoins = []; // uncollected coins are lost
