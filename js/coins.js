@@ -5,6 +5,7 @@
 import { COINS } from './config.js';
 import { distToSegmentSq } from './chain.js';
 import { arcade, pixel } from './fonts.js';
+import { sprite, blit } from './sprites.js';
 
 export function dropCoins(game, e) {
   // e.g. 3 coins x 0.8 = 2.4 -> 2 coins, plus a 40% chance of a third
@@ -82,34 +83,46 @@ export function updateCoins(game, dt) {
   game.floorCoins = keep;
 }
 
+const SPIN_FRAMES = 12;
+
+/** One coin at a given spin frame, centred, at full size (cached as a sprite). */
+function coinSprite(frame) {
+  const r = COINS.radius;
+  return sprite(`coin|${r}|${frame}`, r * 2 + 6, (c, h) => {
+    const w = Math.abs(Math.cos((frame / SPIN_FRAMES) * Math.PI)); // squash as it spins
+    c.fillStyle = '#ffca28';
+    c.strokeStyle = '#b8860b';
+    c.lineWidth = 1.5;
+    c.beginPath();
+    c.ellipse(h, h, Math.max(1.5, r * w), r, 0, 0, Math.PI * 2);
+    c.fill();
+    c.stroke();
+    if (w > 0.4) {
+      c.fillStyle = '#fff3c4';
+      c.beginPath();
+      c.ellipse(h - r * 0.25 * w, h - r * 0.3, r * 0.25 * w, r * 0.2, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+  });
+}
+
 export function drawCoins(ctx, coins) {
   const r = COINS.radius;
+  // All shadows in one path, then the coins as cached sprites
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+  ctx.beginPath();
+  for (const c of coins) {
+    const size = r * (0.4 + 0.6 * Math.min(1, c.age / 0.2));
+    ctx.moveTo(c.x + 1 + size * 0.8, c.y + size * 0.9);
+    ctx.ellipse(c.x + 1, c.y + size * 0.9, size * 0.8, size * 0.3, 0, 0, Math.PI * 2);
+  }
+  ctx.fill();
   for (const c of coins) {
     // Not collectible yet: pops in and stays dim
-    const ready = collectible(c);
-    const t = Math.min(1, c.age / 0.2);
-    const size = r * (0.4 + 0.6 * t);
-    ctx.globalAlpha = ready ? 1 : 0.5;
-
-    const w = Math.abs(Math.cos(c.spin)); // spinning: squash horizontally
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-    ctx.beginPath();
-    ctx.ellipse(c.x + 1, c.y + size * 0.9, size * 0.8, size * 0.3, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#ffca28';
-    ctx.strokeStyle = '#b8860b';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.ellipse(c.x, c.y, Math.max(1.5, size * w), size, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    if (w > 0.4) {
-      ctx.fillStyle = '#fff3c4';
-      ctx.beginPath();
-      ctx.ellipse(c.x - size * 0.25 * w, c.y - size * 0.3, size * 0.25 * w, size * 0.2, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    ctx.globalAlpha = collectible(c) ? 1 : 0.5;
+    const grow = 0.4 + 0.6 * Math.min(1, c.age / 0.2);
+    const frame = Math.floor(((c.spin / Math.PI) % 1) * SPIN_FRAMES) % SPIN_FRAMES;
+    blit(ctx, coinSprite(frame), c.x, c.y, grow);
   }
   ctx.globalAlpha = 1;
 }

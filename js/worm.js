@@ -35,17 +35,41 @@ function smooth(pts, steps = 4) {
   return out;
 }
 
-/** Draw a tapered tube along samples (head first): width goes from w0 to w1. */
+/**
+ * Draw a tapered tube along samples (head first): width goes from w0 to w1.
+ * Built as one filled outline (left edge forward, right edge back, round ends), which
+ * is far cheaper than stroking every little segment separately.
+ */
 function tube(ctx, S, w0, w1, style, extra = 0, dx = 0, dy = 0) {
-  ctx.strokeStyle = style;
-  for (let i = 0; i < S.length - 1; i++) {
-    const k = i / (S.length - 1);
-    ctx.lineWidth = w0 + (w1 - w0) * k + extra;
-    ctx.beginPath();
-    ctx.moveTo(S[i].x + dx, S[i].y + dy);
-    ctx.lineTo(S[i + 1].x + dx, S[i + 1].y + dy);
-    ctx.stroke();
+  const n = S.length;
+  const L = new Array(n);
+  const R = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const a = S[Math.max(0, i - 1)];
+    const b = S[Math.min(n - 1, i + 1)];
+    let tx = b.x - a.x;
+    let ty = b.y - a.y;
+    const d = Math.hypot(tx, ty) || 1;
+    tx /= d; ty /= d;
+    const half = (w0 + (w1 - w0) * (i / (n - 1)) + extra) / 2;
+    L[i] = [S[i].x + dx - ty * half, S[i].y + dy + tx * half];
+    R[i] = [S[i].x + dx + ty * half, S[i].y + dy - tx * half];
   }
+  ctx.fillStyle = style;
+  ctx.beginPath();
+  ctx.moveTo(L[0][0], L[0][1]);
+  for (let i = 1; i < n; i++) ctx.lineTo(L[i][0], L[i][1]);
+  for (let i = n - 1; i >= 0; i--) ctx.lineTo(R[i][0], R[i][1]);
+  ctx.closePath();
+  ctx.fill();
+  // round ends
+  const h0 = (w0 + extra) / 2;
+  const h1 = (w1 + extra) / 2;
+  ctx.beginPath();
+  ctx.arc(S[0].x + dx, S[0].y + dy, h0, 0, Math.PI * 2);
+  ctx.moveTo(S[n - 1].x + dx + h1, S[n - 1].y + dy);
+  ctx.arc(S[n - 1].x + dx, S[n - 1].y + dy, h1, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 /** One worm body from its head to the knot. */

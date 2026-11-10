@@ -16,18 +16,25 @@ const TOP = 1.2; // pointy end
 const BOT = 0.9; // round end
 
 /** Random speckles so every egg looks a little different. Positions in units of r. */
-export function makeSpeckles() {
+export function makeSpeckles(rand = Math.random) {
   const list = [];
-  const n = 3 + Math.floor(Math.random() * 3);
+  const n = 3 + Math.floor(rand() * 3);
   for (let i = 0; i < n; i++) {
     list.push({
-      x: (Math.random() - 0.5) * 1.1,
-      y: (Math.random() - 0.5) * 1.4,
-      s: 0.07 + Math.random() * 0.07,
+      x: (rand() - 0.5) * 1.1,
+      y: (rand() - 0.5) * 1.4,
+      s: 0.07 + rand() * 0.07,
     });
   }
   return list;
 }
+
+// A fixed set of speckle patterns, so egg sprites can be cached (see sprites.js)
+export const SPECKLE_SETS = (() => {
+  let seed = 7;
+  const rand = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  return Array.from({ length: 8 }, () => makeSpeckles(rand));
+})();
 
 function eggPath(ctx, r) {
   ctx.beginPath();
@@ -49,7 +56,12 @@ export function drawEgg(ctx, x, y, r, angle, speckles, flash = false, scale = 1)
 
   ctx.rotate(angle);
   ctx.scale(scale, scale);
+  drawEggBody(ctx, r, speckles, flash);
+  ctx.restore();
+}
 
+/** The egg itself (no shadow), centred at the origin, not rotated. */
+export function drawEggBody(ctx, r, speckles, flash = false) {
   eggPath(ctx, r);
   ctx.fillStyle = flash ? '#ffffff' : SHELL;
   ctx.fill();
@@ -77,7 +89,6 @@ export function drawEgg(ctx, x, y, r, angle, speckles, flash = false, scale = 1)
   ctx.lineWidth = 1.2;
   eggPath(ctx, r);
   ctx.stroke();
-  ctx.restore();
 }
 
 // ---------------------------------------------------------------------------
@@ -180,12 +191,15 @@ export function drawFloorEffects(ctx, effects) {
 
 /** Shell halves and shards go above enemies. */
 export function drawAirEffects(ctx, effects) {
+  // Position each piece with one setTransform (much cheaper than save/translate/rotate/restore)
+  const base = ctx.getTransform();
+  const k = base.a; // the canvas's pixel scale
   for (const f of effects) {
     if (f.kind === 'yolk') continue;
     ctx.globalAlpha = Math.max(0, f.life / f.maxLife);
-    ctx.save();
-    ctx.translate(f.x, f.y);
-    ctx.rotate(f.angle);
+    const cos = Math.cos(f.angle || 0);
+    const sin = Math.sin(f.angle || 0);
+    ctx.setTransform(k * cos, k * sin, -k * sin, k * cos, base.e + k * f.x, base.f + k * f.y);
 
     if (f.kind === 'coinpop') {
       drawCoinPop(ctx, f);
@@ -209,8 +223,8 @@ export function drawAirEffects(ctx, effects) {
     } else {
       drawHalf(ctx, f.r, f.half, f.speckles);
     }
-    ctx.restore();
   }
+  ctx.setTransform(base);
   ctx.globalAlpha = 1;
 }
 
