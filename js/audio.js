@@ -4,12 +4,12 @@
 
 const MASTER_VOLUME = 0.5;
 // Don't spam: at most one sound of each kind per this many seconds
-const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1, whoosh: 0.5, beam: 1, fall: 1, boom: 0.5, toss: 0.2 };
+const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1, whoosh: 0.5, beam: 1, fall: 1, boom: 0.5, toss: 0.2, weee: 0.3 };
 
 let ctx = null;
 let master = null;
 let muted = false;
-const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity, whoosh: -Infinity, beam: -Infinity, fall: -Infinity, boom: -Infinity, toss: -Infinity };
+const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity, whoosh: -Infinity, beam: -Infinity, fall: -Infinity, boom: -Infinity, toss: -Infinity, weee: -Infinity };
 
 try { muted = localStorage.getItem('tethered-muted') === '1'; } catch { /* storage blocked */ }
 
@@ -85,6 +85,12 @@ export function playBoom() {
 }
 
 /** A worm head gets thrown: a quick "hup" plus a swoosh. */
+/** The thrown head flies through the air: "weeee!" (lasts `dur` seconds). */
+export function playWeee(dur) {
+  if (!canPlay('weee')) return;
+  weee(ctx, master, ctx.currentTime, dur);
+}
+
 export function playThrow() {
   if (!canPlay('toss')) return;
   toss(ctx, master, ctx.currentTime);
@@ -532,4 +538,40 @@ export function toss(ac, dest, t) {
   ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
   n.connect(bp).connect(ng).connect(dest);
   n.start(t + 0.05);
+}
+
+export function weee(ac, dest, t, dur) {
+  // A happy high "weeee!": a voice with "ee" mouth shapes (formants), its pitch
+  // swooping up and then down as the head flies over its arc, with a wobble
+  const len = dur + 0.25;
+  const base = 520 + Math.random() * 120; // a little different every throw
+  const o = ac.createOscillator();
+  o.type = 'sawtooth';
+  o.frequency.setValueAtTime(base, t);
+  o.frequency.exponentialRampToValueAtTime(base * 1.9, t + len * 0.45);
+  o.frequency.exponentialRampToValueAtTime(base * 1.2, t + len);
+  const vib = ac.createOscillator();
+  const vibGain = ac.createGain();
+  vib.frequency.value = 7;
+  vibGain.gain.value = 18;
+  vib.connect(vibGain).connect(o.frequency);
+
+  const env = ac.createGain();
+  env.gain.setValueAtTime(0.0001, t);
+  env.gain.exponentialRampToValueAtTime(0.4, t + 0.04);
+  env.gain.setValueAtTime(0.4, t + len * 0.7);
+  env.gain.exponentialRampToValueAtTime(0.0001, t + len);
+  //          "ee" formants: low F1, high F2/F3
+  for (const [f, q, gain] of [[320, 8, 1], [2400, 10, 0.7], [3100, 12, 0.4]]) {
+    const bp = ac.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = f;
+    bp.Q.value = q;
+    const g = ac.createGain();
+    g.gain.value = gain;
+    o.connect(bp).connect(g).connect(env);
+  }
+  env.connect(dest);
+  o.start(t); o.stop(t + len + 0.05);
+  vib.start(t); vib.stop(t + len + 0.05);
 }

@@ -4,7 +4,7 @@
 // so a throw through a crowd sweeps the chain through it.
 
 import { THROW } from './config.js';
-import { playThrow } from './audio.js';
+import { playThrow, playWeee } from './audio.js';
 
 /** Player `i` tries to throw the other head. Returns true if it worked. */
 export function tryThrow(game, i) {
@@ -35,6 +35,7 @@ export function tryThrow(game, i) {
   other.lookY = (ty - other.y) / len;
   thrower.throwCd = THROW.cooldown;
   playThrow();
+  playWeee(THROW.flightTime); // the thrown head enjoys the ride
   return true;
 }
 
