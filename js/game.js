@@ -284,10 +284,11 @@ export function drawGame(ctx, game) {
   drawBossArrows(ctx, game.enemies, game.width, game.height);
   drawCraters(ctx, game);
   drawWormhole(ctx, game);
-  // In the other dimension the enemies look a little different (shifted colours)
-  if (game.dimension === 1) ctx.filter = 'hue-rotate(150deg) saturate(1.4)';
-  drawEnemies(ctx, game.enemies);
-  ctx.filter = 'none';
+  // In the other dimension the enemies look a little different: they're drawn on
+  // their own layer, which gets one colour wash. (A per-shape canvas filter looked
+  // similar but was far too slow with many enemies.)
+  if (game.dimension === 1) drawTintedEnemies(ctx, game);
+  else drawEnemies(ctx, game.enemies);
   drawWormBody(ctx, game.chain); // the chain is the worm's body
   drawAirEffects(ctx, game.effects);
   drawProjectiles(ctx, game.projectiles);
@@ -406,4 +407,33 @@ function drawPowersHud(ctx, game) {
     ctx.font = 'italic 12px system-ui, sans-serif';
     ctx.fillText(`heard: "${v.lastHeard.slice(-40)}"`, x, y - 17);
   }
+}
+
+// ---------- Other-dimension enemy layer ----------
+let layer = null;
+let layerCtx = null;
+
+function drawTintedEnemies(ctx, game) {
+  const dpr = window.devicePixelRatio || 1;
+  const pw = Math.round(game.width * dpr);
+  const ph = Math.round(game.height * dpr);
+  if (!layer || layer.width !== pw || layer.height !== ph) {
+    layer = document.createElement('canvas');
+    layer.width = pw;
+    layer.height = ph;
+    layerCtx = layer.getContext('2d');
+  }
+  const L = layerCtx;
+  L.setTransform(1, 0, 0, 1, 0, 0);
+  L.clearRect(0, 0, pw, ph);
+  L.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawEnemies(L, game.enemies);
+  // Wash a colour over only the enemy pixels
+  L.globalCompositeOperation = 'source-atop';
+  L.fillStyle = 'rgba(90, 255, 190, 0.42)';
+  L.fillRect(0, 0, game.width, game.height);
+  L.fillStyle = 'rgba(200, 60, 255, 0.18)';
+  L.fillRect(0, 0, game.width, game.height);
+  L.globalCompositeOperation = 'source-over';
+  ctx.drawImage(layer, 0, 0, game.width, game.height);
 }

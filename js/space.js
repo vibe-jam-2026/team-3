@@ -177,6 +177,13 @@ function drawRingedPlanet(c, x, y, r, T) {
   c.restore();
 }
 
+/** Build a dimension's sky ahead of time (so switching to it doesn't stutter). */
+export function prepareSpace(w, h, dimension) {
+  const dpr = window.devicePixelRatio || 1;
+  const c = caches[dimension];
+  if (!c || c.w !== w || c.h !== h || c.dpr !== dpr) caches[dimension] = build(w, h, dpr, THEMES[dimension]);
+}
+
 /** Draw the space background filling w x h. dimension 0 = normal, 1 = the other dimension. */
 export function drawSpace(ctx, w, h, dimension = 0) {
   const dpr = window.devicePixelRatio || 1;
