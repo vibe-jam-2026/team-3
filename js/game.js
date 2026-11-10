@@ -7,6 +7,7 @@ import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS, ALIEN } from './config.
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits } from './chain.js';
 import { drawWormBody, drawWormHead } from './worm.js';
 import { drawSpace } from './space.js';
+import { tintedContext } from './palette.js';
 import { rollWormhole, updateWormhole, drawWormhole, drawDimensionFlash } from './wormhole.js';
 import { voiceStatus } from './voice.js';
 import { POWERS } from './config.js';
@@ -438,31 +439,11 @@ function drawPowersHud(ctx, game) {
   }
 }
 
-// ---------- Other-dimension enemy layer ----------
-let layer = null;
-let layerCtx = null;
-
+// ---------- Other-dimension enemies ----------
+// Drawn through a context stand-in that swaps their colours for hue-shifted ones
+// (see palette.js). No extra layers or filters, so it costs about the same as
+// drawing them normally. (A canvas filter, a full-screen layer and per-enemy
+// scratch canvases were all tried and were much slower.)
 function drawTintedEnemies(ctx, game) {
-  const dpr = window.devicePixelRatio || 1;
-  const pw = Math.round(game.width * dpr);
-  const ph = Math.round(game.height * dpr);
-  if (!layer || layer.width !== pw || layer.height !== ph) {
-    layer = document.createElement('canvas');
-    layer.width = pw;
-    layer.height = ph;
-    layerCtx = layer.getContext('2d');
-  }
-  const L = layerCtx;
-  L.setTransform(1, 0, 0, 1, 0, 0);
-  L.clearRect(0, 0, pw, ph);
-  L.setTransform(dpr, 0, 0, dpr, 0, 0);
-  drawEnemies(L, game.enemies);
-  // Wash a colour over only the enemy pixels
-  L.globalCompositeOperation = 'source-atop';
-  L.fillStyle = 'rgba(90, 255, 190, 0.42)';
-  L.fillRect(0, 0, game.width, game.height);
-  L.fillStyle = 'rgba(200, 60, 255, 0.18)';
-  L.fillRect(0, 0, game.width, game.height);
-  L.globalCompositeOperation = 'source-over';
-  ctx.drawImage(layer, 0, 0, game.width, game.height);
+  drawEnemies(tintedContext(ctx), game.enemies);
 }
