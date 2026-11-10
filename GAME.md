@@ -14,6 +14,8 @@ All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
 Images and videos: **[media/](media/README.md)** (with a guide to uploading them)
 
+**▶ 60-second pitch video:** [media/videos/wormageddon-pitch.mp4](media/videos/wormageddon-pitch.mp4) · online: https://vibe-jam-2026.github.io/team-3/media/videos/wormageddon-pitch.mp4
+
 Current version: **1.19** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
