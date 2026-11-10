@@ -4,6 +4,7 @@
 
 import { moveVector, wasPressed } from './input.js';
 import { tryThrow, updateThrown, throwHeight } from './throw.js';
+import { maybeDropYarn, updateYarn, drawYarns, drawStampede } from './yarn.js';
 import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS, ALIEN } from './config.js';
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits } from './chain.js';
 import { drawWormBody, drawWormHead } from './worm.js';
@@ -66,6 +67,8 @@ export function createGame(width, height) {
     coins: DEBUG.startCoins, // the team's shared wallet
     waveCoins: 0,
     floorCoins: [], // dropped coins waiting to be picked up
+    yarns: [],      // rare yarn-ball drops
+    stampede: null, // running cat stampede
     projectiles: [], // alien shots
     powers: createPowers(), // voice powers: beam + meteor
     upgrades: createUpgradeLevels(),
@@ -120,6 +123,8 @@ export function startNextWave(game) {
   game.projectiles = [];
   rollWormhole(game, !!bossForWave(game.wave));
   game.floorCoins = []; // uncollected coins are lost
+  game.yarns = [];
+  game.stampede = null;
   game.status = 'playing';
   for (const p of game.players) {
     p.hp = Math.min(p.maxHp, p.hp + WAVES.healBetweenWaves);
@@ -274,11 +279,13 @@ export function updateGame(game, dt) {
       game.kills += 1;
       game.waveKills += 1;
       dropCoins(game, e);
+      maybeDropYarn(game, e);
     }
   }
   game.enemies = game.enemies.filter((e) => !e.dead);
 
   updateCoins(game, dt);
+  updateYarn(game, dt);
   game.effects = updateEffects(game.effects, dt);
 
   // --- Win / lose ---
@@ -318,6 +325,7 @@ export function drawGame(ctx, game) {
   drawFloorEffects(ctx, game.effects);
   drawMagnetFields(ctx, game);
   drawCoins(ctx, game.floorCoins);
+  drawYarns(ctx, game);
   drawBossArrows(ctx, game.enemies, game.width, game.height);
   drawCraters(ctx, game);
   drawWormhole(ctx, game);
@@ -334,6 +342,7 @@ export function drawGame(ctx, game) {
   game.players.forEach((p, i) => drawPlayer(ctx, p, i === 0 ? pts[1] : pts[pts.length - 2]));
 
   drawBeams(ctx, game);
+  drawStampede(ctx, game);
   drawMeteor(ctx, game);
   drawImpactFlash(ctx, game);
   drawDimensionFlash(ctx, game);

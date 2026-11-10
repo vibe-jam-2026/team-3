@@ -123,6 +123,16 @@ Spawn interval by wave (after the 20% boost):
 - Price per level follows Fibonacci, the same for every upgrade: **1, 2, 3, 5, 8, 13, 21, 34, 55, …**
 - The extra **Max All** card is a trap: it makes the next wave a flood of unkillable enemies (one every 0.04 s, up to 300).
 
+## Yarn ball (cat stampede)
+
+| Stat | Value |
+|---|---|
+| Drop chance | 1% per kill (any enemy killed by the players) |
+| Pick up | touch it with a worm head or the body (after 0.4 s) |
+| Stays | 15 s, blinks in the last 3 s |
+| Stampede | 10 cats, one per lane across the full height, running ~900 px/s from one side to the other |
+| Effect | every enemy (and rat) in the cats' path dies; alien shots are trampled; bosses lose 2 hits |
+
 ## Partner throw
 
 | Stat | Value |
@@ -179,6 +189,7 @@ Spawn interval by wave (after the 20% boost):
 | `?start=10` | begin at wave 10, with upgrades worth ≈ 324 coins (every upgrade level 7) |
 | `?coins=200` | start with 200 coins |
 | `?wormhole` | a wormhole opens 2 s into every normal wave |
+| `?yarn` | yarn balls drop from 25% of kills instead of 1% |
 
 Any `?start=N` gives upgrades worth `12 × (N − 1)^1.5` coins, spent evenly across all upgrades (cheapest next level first). Combine options, e.g. `?god&start=5&coins=200`.
 
