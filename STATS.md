@@ -4,7 +4,7 @@ All base values in the game. The real numbers live in `js/config.js` (and upgrad
 
 **▶ Play: https://vibe-jam-2026.github.io/team-3/** · Concept: [GAME.md](GAME.md)
 
-## Players (each is a worm head)
+## Players (each is a worm)
 
 | Stat | Base | Per upgrade level |
 |---|---|---|
@@ -18,7 +18,7 @@ All base values in the game. The real numbers live in `js/config.js` (and upgrad
 - Both players heal to full between waves.
 - Coins can be collected 1 s after they drop: by touching a player, touching the chain, or being pulled in by the magnet field (pull speed 260 px/s).
 
-## Chain (the worm body)
+## Chain (the two worm bodies, tied in a knot)
 
 | Stat | Value |
 |---|---|

@@ -12,7 +12,7 @@ All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
 Images and videos: **[media/](media/README.md)** (with a guide to uploading them)
 
-Current version: **1.14** (shown in the bottom-right corner of the game)
+Current version: **1.15** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
@@ -37,7 +37,7 @@ the players survive by moving, and by using the chain itself as a weapon.
 ## Rules — v1 (decided)
 | Topic | v1 decision |
 |---|---|
-| Players | 2, local, same keyboard. Together they are **one two-headed worm**: each player controls a worm head (wearing a **space helmet**), and the chain between them is the worm's body |
+| Players | 2, local, same keyboard. Each player is a **worm** (wearing a **space helmet**); the two worms' tails are **tied together in a knot**, and their bodies are the chain between the players. P1's worm is rosy pink, P2's peachy pink |
 | Controls | P1: `W A S D` · P2: arrow keys (gamepads later) |
 | Arena | One box the size of the browser window, set **in space** (stars, nebulas, planets); players can't leave it |
 | Chain | Physical rope of segments between the players, with a max length. When stretched it pulls the players toward each other |
