@@ -4,12 +4,12 @@
 
 const MASTER_VOLUME = 0.5;
 // Don't spam: at most one sound of each kind per this many seconds
-const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1 };
+const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1, whoosh: 0.5 };
 
 let ctx = null;
 let master = null;
 let muted = false;
-const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity };
+const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity, whoosh: -Infinity };
 
 try { muted = localStorage.getItem('tethered-muted') === '1'; } catch { /* storage blocked */ }
 
@@ -59,6 +59,12 @@ export function playCluck() {
 export function playCrow() {
   if (!canPlay('crow')) return;
   crow(ctx, master, ctx.currentTime);
+}
+
+/** The worm goes through a wormhole: a swirling whoosh. */
+export function playWhoosh() {
+  if (!canPlay('whoosh')) return;
+  whoosh(ctx, master, ctx.currentTime);
 }
 
 /** The space cat's UFO arrives: "mjau". */
@@ -297,4 +303,46 @@ export function meow(ac, dest, t) {
   env.connect(dest);
   o.start(t); o.stop(t + dur + 0.05);
   vib.start(t); vib.stop(t + dur + 0.05);
+}
+
+export function whoosh(ac, dest, t) {
+  const dur = 1.1;
+  // Rushing air: noise through a band-pass that sweeps up and back down
+  const len = Math.ceil(ac.sampleRate * dur);
+  const buf = ac.createBuffer(1, len, ac.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const noise = ac.createBufferSource();
+  noise.buffer = buf;
+  const bp = ac.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.Q.value = 3;
+  bp.frequency.setValueAtTime(200, t);
+  bp.frequency.exponentialRampToValueAtTime(2500, t + dur * 0.45);
+  bp.frequency.exponentialRampToValueAtTime(300, t + dur);
+  const ng = ac.createGain();
+  ng.gain.setValueAtTime(0.0001, t);
+  ng.gain.exponentialRampToValueAtTime(0.5, t + 0.15);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  noise.connect(bp).connect(ng).connect(dest);
+  noise.start(t);
+
+  // A wobbling sci-fi tone that bends up, then drops away
+  const o = ac.createOscillator();
+  o.type = 'triangle';
+  o.frequency.setValueAtTime(180, t);
+  o.frequency.exponentialRampToValueAtTime(900, t + dur * 0.5);
+  o.frequency.exponentialRampToValueAtTime(120, t + dur);
+  const lfo = ac.createOscillator();
+  const lfoGain = ac.createGain();
+  lfo.frequency.value = 9;
+  lfoGain.gain.value = 40;
+  lfo.connect(lfoGain).connect(o.frequency);
+  const og = ac.createGain();
+  og.gain.setValueAtTime(0.0001, t);
+  og.gain.exponentialRampToValueAtTime(0.18, t + 0.1);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(og).connect(dest);
+  o.start(t); o.stop(t + dur + 0.05);
+  lfo.start(t); lfo.stop(t + dur + 0.05);
 }

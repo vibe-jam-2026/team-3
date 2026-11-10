@@ -123,6 +123,17 @@ Spawn interval by wave (after the 20% boost):
 - Price per level follows Fibonacci, the same for every upgrade: **1, 2, 3, 5, 8, 13, 21, 34, 55, …**
 - The extra **Max All** card is a trap: it makes the next wave a flood of unkillable enemies (one every 0.04 s, up to 300).
 
+## Wormhole
+
+| Stat | Value |
+|---|---|
+| Chance per wave | 25% (never on boss waves) |
+| Opens | at a random time 5–15 s into the wave |
+| Stays open | 10 s (rim blinks in the last 2.5 s) |
+| Size | radius 34 px; a worm head touching the middle goes through |
+| Going through | switches dimension, removes the enemies and alien shots left behind, 1 s of safety for the worm |
+| Other dimension | greenish sky, different planets, enemies in shifted colours; stats are the same |
+
 ## Highscores
 
 | Rule | Value |
@@ -141,6 +152,7 @@ Spawn interval by wave (after the 20% boost):
 | `?start=5` | begin at wave 5, with upgrades worth ≈ 96 coins (three upgrades level 5, three level 4) |
 | `?start=10` | begin at wave 10, with upgrades worth ≈ 324 coins (every upgrade level 7) |
 | `?coins=200` | start with 200 coins |
+| `?wormhole` | a wormhole opens 2 s into every normal wave |
 
 Any `?start=N` gives upgrades worth `12 × (N − 1)^1.5` coins, spent evenly across all upgrades (cheapest next level first). Combine options, e.g. `?god&start=5&coins=200`.
 

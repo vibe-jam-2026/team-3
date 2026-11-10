@@ -7,6 +7,7 @@ import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS, ALIEN } from './config.
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits } from './chain.js';
 import { drawWormBody, drawWormHead } from './worm.js';
 import { drawSpace } from './space.js';
+import { rollWormhole, updateWormhole, drawWormhole, drawDimensionFlash } from './wormhole.js';
 import { spawnEnemy, updateEnemies, drawEnemies } from './enemies.js';
 import { crackEgg, updateEffects, drawFloorEffects, drawAirEffects } from './egg.js';
 import { featherBurst } from './chicken.js';
@@ -37,6 +38,10 @@ export function createGame(width, height) {
     waveTime: 0,
     spawnTimer: 0,
     bossSpawned: false, // has this wave's boss appeared yet?
+    dimension: 0,   // 0 = normal space, 1 = the other dimension (through a wormhole)
+    wormhole: null, // the open wormhole, if any
+    wormholeAt: null, // when this wave's wormhole opens (seconds), or null
+    dimensionFlash: 0,
     cursedWave: 0,  // set by the "Max All" button: that wave is a flood of unkillable enemies
     ratTimer: 2,    // first rat shows up a little into the wave
     status: 'playing',
@@ -52,6 +57,7 @@ export function createGame(width, height) {
     stats: null,
   };
   applyStats(game);
+  rollWormhole(game, !!bossForWave(game.wave));
   if (DEBUG.startWave > 1) applyDevStartUpgrades(game, DEBUG.startWave);
   return game;
 }
@@ -78,6 +84,7 @@ export function startNextWave(game) {
   game.bossSpawned = false;
   game.enemies = [];
   game.projectiles = [];
+  rollWormhole(game, !!bossForWave(game.wave));
   game.floorCoins = []; // uncollected coins are lost
   game.status = 'playing';
   for (const p of game.players) {
@@ -162,6 +169,7 @@ export function updateGame(game, dt) {
   updateEnemies(game, dt);
 
   updateProjectiles(game, dt);
+  updateWormhole(game, dt);
 
   // Chain hurts enemies
   chainHits(game.chain, game.enemies, dt, (e, speed, vx, vy) => {
@@ -257,7 +265,7 @@ function clampToArena(game, p) {
 // ---------- Drawing ----------
 export function drawGame(ctx, game) {
   // Arena: open space with stars and planets
-  drawSpace(ctx, game.width, game.height);
+  drawSpace(ctx, game.width, game.height, game.dimension);
   ctx.strokeStyle = 'rgba(140, 160, 220, 0.35)';
   ctx.lineWidth = 4;
   ctx.strokeRect(2, 2, game.width - 4, game.height - 4);
@@ -266,7 +274,11 @@ export function drawGame(ctx, game) {
   drawMagnetFields(ctx, game);
   drawCoins(ctx, game.floorCoins);
   drawBossArrows(ctx, game.enemies, game.width, game.height);
+  drawWormhole(ctx, game);
+  // In the other dimension the enemies look a little different (shifted colours)
+  if (game.dimension === 1) ctx.filter = 'hue-rotate(150deg) saturate(1.4)';
   drawEnemies(ctx, game.enemies);
+  ctx.filter = 'none';
   drawWormBody(ctx, game.chain); // the chain is the worm's body
   drawAirEffects(ctx, game.effects);
   drawProjectiles(ctx, game.projectiles);
@@ -274,6 +286,7 @@ export function drawGame(ctx, game) {
   const pts = game.chain.points;
   game.players.forEach((p, i) => drawPlayer(ctx, p, i === 0 ? pts[1] : pts[pts.length - 2]));
 
+  drawDimensionFlash(ctx, game);
   drawHud(ctx, game);
 }
 
@@ -325,6 +338,12 @@ function drawHud(ctx, game) {
     ctx.fillStyle = '#ffd54f';
     ctx.font = '700 13px system-ui, sans-serif';
     ctx.fillText('GOD MODE', game.width - 18, 40);
+  }
+  if (game.dimension === 1) {
+    ctx.fillStyle = '#7dffb8';
+    ctx.font = '700 13px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('OTHER DIMENSION', 18, 70);
   }
 
   drawBossBar(ctx, game);
