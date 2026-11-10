@@ -25,11 +25,20 @@ import { createUpgradeLevels, applyStats } from './upgrades.js';
 
 export const PLAYER_COLORS = ['#4fc3f7', '#ffb74d'];
 
-export function createGame(width, height) {
+/** Where the two worm heads start: side by side in the middle of the arena. */
+function startPositions(width, height) {
   const gap = Math.min(CHAIN.maxLength * 0.6, width * 0.3);
+  return [
+    { x: width / 2 - gap / 2, y: height / 2 },
+    { x: width / 2 + gap / 2, y: height / 2 },
+  ];
+}
+
+export function createGame(width, height) {
+  const start = startPositions(width, height);
   const players = [
-    makePlayer(0, width / 2 - gap / 2, height / 2),
-    makePlayer(1, width / 2 + gap / 2, height / 2),
+    makePlayer(0, start[0].x, start[0].y),
+    makePlayer(1, start[1].x, start[1].y),
   ];
   const game = {
     width,
@@ -80,6 +89,17 @@ function makePlayer(index, x, y) {
 /** Called from the between-waves menu: clear the arena and begin the next wave. */
 export function startNextWave(game) {
   game.wave += 1;
+  // Every wave starts with the worm back in its starting position
+  const start = startPositions(game.width, game.height);
+  game.players.forEach((p, i) => {
+    p.x = start[i].x;
+    p.y = start[i].y;
+    p.lookX = p.lookY = undefined; // eyes face outward again, like at the start
+  });
+  const maxLength = game.chain.maxLength;
+  game.chain = createChain(game.players[0], game.players[1]);
+  game.chain.maxLength = maxLength; // keep the chain-length upgrade
+  game.chain.segLength = maxLength / (game.chain.points.length - 1);
   game.waveTime = 0;
   game.waveKills = 0;
   game.waveCoins = 0;
