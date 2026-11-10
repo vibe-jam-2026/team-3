@@ -5,6 +5,7 @@
 // States: 'walk' -> 'aim' (arrow shown) -> 'charge' (until it reaches a wall) -> 'recover' -> 'walk'
 
 import { BOSS, ENEMY } from './config.js';
+import { arcade, pixel } from './fonts.js';
 
 const SKIN = '#4f8a3c';
 const SKIN_DARK = '#356428';
@@ -332,7 +333,7 @@ export function drawBossBar(ctx, game) {
   ctx.fillStyle = boss.invincible ? '#9e9e9e' : '#e53935';
   ctx.fillRect(x, y, w * (boss.hitsLeft / boss.maxHits), 10);
   ctx.fillStyle = '#e8e6e1';
-  ctx.font = '700 13px system-ui, sans-serif';
+  ctx.font = arcade(9);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
   const name = boss.type === 'alien' ? 'ALIEN BOSS' : 'DINO BOSS';

@@ -3,6 +3,8 @@
 // worm bodies (each tapering from its head to its tail) meeting in a knot in the middle.
 // This is only the look: the chain physics and hits are the same as before.
 
+import { arcade, pixel } from './fonts.js';
+
 // Per worm: skin, darker rings, outline (P1 rosy pink, P2 peachy pink)
 const LOOKS = [
   { skin: '#f29fc0', dark: '#d77aa0', outline: '#7a3552' },
@@ -205,7 +207,7 @@ export function drawWormHead(ctx, p, neck) {
 
   // Player number above the helmet, in the player's colour
   ctx.fillStyle = p.color;
-  ctx.font = 'bold 12px system-ui, sans-serif';
+  ctx.font = arcade(8);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'bottom';
   ctx.fillText(`P${p.index + 1}`, p.x, p.y - r - 7);

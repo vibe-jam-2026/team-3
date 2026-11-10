@@ -7,6 +7,7 @@ import { YARN, DEBUG } from './config.js';
 import { distToSegmentSq } from './chain.js';
 import { hitBoss } from './boss.js';
 import { playStampede } from './audio.js';
+import { arcade, pixel } from './fonts.js';
 
 const YARN_COLORS = ['#e53950', '#7e57c2', '#26a69a', '#ffa726'];
 const CAT_COATS = [
@@ -270,7 +271,7 @@ export function drawStampede(ctx, game) {
     ctx.globalAlpha = Math.min(1, (1.6 - S.t) * 2);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '900 44px system-ui, sans-serif';
+    ctx.font = arcade(28);
     ctx.lineJoin = 'round';
     ctx.strokeStyle = '#3a1d00';
     ctx.lineWidth = 8;

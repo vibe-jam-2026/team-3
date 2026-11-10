@@ -4,6 +4,7 @@
 
 import { COINS } from './config.js';
 import { distToSegmentSq } from './chain.js';
+import { arcade, pixel } from './fonts.js';
 
 export function dropCoins(game, e) {
   // e.g. 3 coins x 0.8 = 2.4 -> 2 coins, plus a 40% chance of a third
@@ -130,7 +131,7 @@ export function drawMagnetFields(ctx, game) {
 /** Small "+1" that floats up when a coin is collected (drawn by the effects code). */
 export function drawCoinPop(ctx, f) {
   ctx.fillStyle = '#ffd54f';
-  ctx.font = 'bold 13px system-ui, sans-serif';
+  ctx.font = arcade(10);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('+1', 0, 0);

@@ -6,6 +6,7 @@ import {
 } from './game.js';
 import { drawBigBang, bigBangTime } from './bigbang.js';
 import { prepareSpace } from './space.js';
+import { arcade, pixel } from './fonts.js';
 import { addScore, loadScores, bestScore, MAX_ENTRIES } from './highscores.js';
 import { DEBUG } from './config.js';
 import { VERSION } from './version.js';
@@ -290,7 +291,7 @@ function draw() {
 
 /** Version number in the bottom-right corner of every screen. */
 function drawVersion() {
-  ctx.font = '600 12px system-ui, sans-serif';
+  ctx.font = arcade(8);
   ctx.textAlign = 'right';
   ctx.textBaseline = 'bottom';
   ctx.fillStyle = 'rgba(232, 230, 225, 0.55)';
@@ -307,20 +308,44 @@ function drawTitle() {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  // Title slams in out of the explosion
+  // Title slams in out of the explosion: WORMAGEDDON / IN SPACE, arcade style
+  const fit = Math.min(1, (width - 40) / (11 * 46)); // shrink on narrow screens
   const tIn = Math.min(1, Math.max(0, (t - 0.5) / 0.6));
   if (tIn > 0) {
     const ease = 1 - (1 - tIn) ** 3;
-    const scale = 2.2 - 1.2 * ease;
+    const scale = (2.2 - 1.2 * ease) * fit;
     ctx.save();
     ctx.globalAlpha = tIn;
-    ctx.translate(cx, cy - 110);
+    ctx.translate(cx, cy - 135);
     ctx.scale(scale, scale);
-    ctx.shadowColor = 'rgba(255, 200, 120, 0.9)';
-    ctx.shadowBlur = 30 * (1 - ease) + 12;
-    ctx.fillStyle = '#fff6e6';
-    ctx.font = '800 64px system-ui, sans-serif';
-    ctx.fillText('TETHERED', 0, 0);
+    ctx.font = arcade(46);
+    ctx.lineJoin = 'round';
+    // chunky dark outline + drop shadow, like an old arcade marquee
+    ctx.fillStyle = '#2a0838';
+    ctx.fillText('WORMAGEDDON', 4, 5);
+    ctx.strokeStyle = '#2a0838';
+    ctx.lineWidth = 10;
+    ctx.strokeText('WORMAGEDDON', 0, 0);
+    const g = ctx.createLinearGradient(0, -23, 0, 23);
+    g.addColorStop(0, '#fff59d');
+    g.addColorStop(0.45, '#ffb300');
+    g.addColorStop(1, '#ff3d00');
+    ctx.shadowColor = 'rgba(255, 140, 40, 0.9)';
+    ctx.shadowBlur = 30 * (1 - ease) + 14;
+    ctx.fillStyle = g;
+    ctx.fillText('WORMAGEDDON', 0, 0);
+    // IN SPACE
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = 'rgba(120, 200, 255, 0.9)';
+    ctx.font = arcade(22);
+    ctx.strokeStyle = '#0b1640';
+    ctx.lineWidth = 7;
+    ctx.strokeText('IN SPACE', 0, 52);
+    const g2 = ctx.createLinearGradient(0, 40, 0, 64);
+    g2.addColorStop(0, '#e1f5fe');
+    g2.addColorStop(1, '#4fc3f7');
+    ctx.fillStyle = g2;
+    ctx.fillText('IN SPACE', 0, 52);
     ctx.restore();
   }
 
@@ -330,34 +355,32 @@ function drawTitle() {
   // Dark halo so the text stays readable on top of the glowing core
   ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
   ctx.shadowBlur = 8;
-  ctx.font = '18px system-ui, sans-serif';
+  ctx.font = pixel(26);
   ctx.fillStyle = '#d9cfe8';
-  ctx.fillText('In the beginning there were two worms. Tied together.', cx, cy - 60);
+  ctx.fillText('In the beginning there were two worms. Tied together.', cx, cy - 40);
 
-  ctx.font = '600 18px system-ui, sans-serif';
+  ctx.font = arcade(12);
   ctx.fillStyle = PLAYER_COLORS[0];
-  ctx.fillText('Player 1: W A S D · Q throw', cx, cy);
+  ctx.fillText('P1  W A S D   Q THROW', cx, cy + 5);
   ctx.fillStyle = PLAYER_COLORS[1];
-  ctx.fillText('Player 2: Arrow keys · . throw', cx, cy + 30);
+  ctx.fillText('P2  ARROWS    . THROW', cx, cy + 32);
 
   const blink = Math.floor(performance.now() / 500) % 2 === 0;
   if (blink && t > 1.7) {
     ctx.fillStyle = '#ffffff';
-    ctx.font = '600 22px system-ui, sans-serif';
-    ctx.fillText('Press Enter to start', cx, cy + 100);
+    ctx.font = arcade(16);
+    ctx.fillText('PRESS ENTER TO START', cx, cy + 95);
   }
 
-  ctx.font = '14px system-ui, sans-serif';
-  ctx.fillStyle = '#a79fb8';
   // Best run so far on this computer
   const best = bestScore();
   if (best) {
-    ctx.font = '600 15px system-ui, sans-serif';
+    ctx.font = arcade(10);
     ctx.fillStyle = '#ffd54f';
-    ctx.fillText(`Highscore: wave ${best.wave} cleared by ${best.p1} & ${best.p2}`, cx, cy + 150);
+    ctx.fillText(`HI-SCORE  WAVE ${best.wave}  ${best.p1} & ${best.p2}`, cx, cy + 145);
   }
 
-  ctx.font = '14px system-ui, sans-serif';
+  ctx.font = pixel(20);
   ctx.fillStyle = '#a79fb8';
   ctx.fillText(`Esc / P: pause · M: sound ${isMuted() ? 'off' : 'on'} · N: music ${isMusicOn() ? 'on' : 'off'} · V: voice on/off`, cx, height - 30);
   ctx.globalAlpha = 1;
@@ -374,9 +397,9 @@ function drawOverlay(title, lines) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#e8e6e1';
-  ctx.font = '700 48px system-ui, sans-serif';
-  ctx.fillText(title, cx, cy - 40);
-  ctx.font = '20px system-ui, sans-serif';
+  ctx.font = arcade(30);
+  ctx.fillText(title.toUpperCase(), cx, cy - 40);
+  ctx.font = pixel(28);
   lines.forEach((line, i) => ctx.fillText(line, cx, cy + 10 + i * 32));
 }
 
