@@ -9,7 +9,6 @@ import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS, ALIEN } from './config.
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits } from './chain.js';
 import { drawWormBody, drawWormHead } from './worm.js';
 import { drawSpace } from './space.js';
-import { tintedContext } from './palette.js';
 import { rollWormhole, updateWormhole, drawWormhole, drawDimensionFlash } from './wormhole.js';
 import { voiceStatus } from './voice.js';
 import { POWERS } from './config.js';
@@ -333,8 +332,7 @@ export function drawGame(ctx, game) {
   // In the other dimension the enemies look a little different: they're drawn on
   // their own layer, which gets one colour wash. (A per-shape canvas filter looked
   // similar but was far too slow with many enemies.)
-  if (game.dimension === 1) drawTintedEnemies(ctx, game);
-  else drawEnemies(ctx, game.enemies);
+  drawEnemies(ctx, game.enemies, game.dimension);
   drawWormBody(ctx, game.chain); // the chain is the worm's body
   drawAirEffects(ctx, game.effects);
   drawProjectiles(ctx, game.projectiles);
@@ -480,11 +478,3 @@ function drawPowersHud(ctx, game) {
   }
 }
 
-// ---------- Other-dimension enemies ----------
-// Drawn through a context stand-in that swaps their colours for hue-shifted ones
-// (see palette.js). No extra layers or filters, so it costs about the same as
-// drawing them normally. (A canvas filter, a full-screen layer and per-enemy
-// scratch canvases were all tried and were much slower.)
-function drawTintedEnemies(ctx, game) {
-  drawEnemies(tintedContext(ctx), game.enemies);
-}

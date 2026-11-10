@@ -2,7 +2,9 @@
 // They spawn at the arena edge and chase the nearest player.
 
 import { ENEMY, ENEMY_TYPES, TIER_SPAWNS, RATS } from './config.js';
-import { drawEgg, makeSpeckles } from './egg.js';
+import { drawEgg, drawEggBody, SPECKLE_SETS } from './egg.js';
+import { sprite, blit } from './sprites.js';
+import { tintedContext } from './palette.js';
 import { drawChicken } from './chicken.js';
 import { playCluck, playCrow, playSqueak } from './audio.js';
 import { updateRat, drawRat } from './rat.js';
@@ -48,7 +50,8 @@ export function spawnEnemy(game, forcedType = null) {
     flash: 0,
     spawnAnim: 0.4,        // fade-in; harmless while spawning
     roll: Math.random() * Math.PI * 2, // current rotation as it rolls
-    speckles: makeSpeckles(),
+    speckleId: Math.floor(Math.random() * SPECKLE_SETS.length),
+    speckles: null, // set just below from speckleId
     facing: Math.random() < 0.5 ? -1 : 1, // chickens look left or right
     walk: Math.random() * 10,             // walk-cycle phase
     dead: false,
@@ -56,6 +59,7 @@ export function spawnEnemy(game, forcedType = null) {
     invincible: wave === game.cursedWave && !def.neutral, // "Max All" curse
   });
   const e = game.enemies[game.enemies.length - 1];
+  e.speckles = SPECKLE_SETS[e.speckleId];
   if (type === 'rat') {
     e.hitsLeft = e.maxHits = game.stats.ratHits; // Rat health upgrade
     e.speed = RATS.speed;
@@ -150,16 +154,53 @@ function nearest(players, e) {
   return best;
 }
 
-export function drawEnemies(ctx, enemies) {
+// Walk-cycle frames cached per enemy look (more frames = smoother legs, more memory)
+const WALK_FRAMES = 8;
+
+/**
+ * Draw all enemies. Eggs, chickens, roosters and walking rats come from the sprite
+ * cache (see sprites.js); bosses and eating rats are drawn directly.
+ * dimension 1 = the other dimension: everything is drawn with shifted colours.
+ */
+export function drawEnemies(ctx, enemies, dimension = 0) {
+  const tinted = dimension === 1;
+  const direct = tinted ? tintedContext(ctx) : ctx;
+  const look = (c) => (tinted ? tintedContext(c) : c);
   for (const e of enemies) {
     const appear = 1 - e.spawnAnim / 0.4;           // 0 -> 1 while spawning
     ctx.globalAlpha = 0.3 + 0.7 * appear;
     const scale = 0.5 + 0.5 * appear;
-    if (e.type === 'alien') drawAlien(ctx, e, scale);
-    else if (e.boss) drawBoss(ctx, e, scale);
-    else if (e.type === 'rat') drawRat(ctx, e, scale);
-    else if (e.type === 'egg') drawEgg(ctx, e.x, e.y, e.r, e.roll, e.speckles, e.flash > 0, scale);
-    else drawChicken(ctx, e, e.type === 'rooster', scale);
+    const flash = e.flash > 0;
+    if (e.type === 'alien') drawAlien(direct, e, scale);
+    else if (e.boss) drawBoss(direct, e, scale);
+    else if (e.type === 'egg') {
+      // Shadow on the ground, then the cached egg, rotated as it rolls
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.beginPath();
+      ctx.ellipse(e.x + 2, e.y + e.r * 0.9, e.r * 0.9 * scale, e.r * 0.35 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      const size = e.r * 2.8;
+      const s = sprite(`egg|${e.r}|${e.speckleId}|${flash}|${dimension}`, size, (c, h) => {
+        c.translate(h, h);
+        drawEggBody(look(c), e.r, e.speckles, flash);
+      });
+      blit(ctx, s, e.x, e.y, scale, false, e.roll);
+    } else if (e.type === 'rat' && e.state === 'eat') {
+      drawRat(direct, e, scale); // animated by the clock while eating: drawn directly
+    } else {
+      // Chickens, roosters and walking rats: cached walk-cycle frames
+      const isRat = e.type === 'rat';
+      const speed = isRat ? 3 : 2.2;                // matches the legs' cycle in their draw code
+      const cycle = (Math.PI * 2) / speed;
+      const frame = Math.floor((((e.walk % cycle) + cycle) % cycle) / cycle * WALK_FRAMES);
+      const size = e.r * (isRat ? 5 : 3.2);
+      const s = sprite(`${e.type}|${e.r}|${frame}|${flash}|${dimension}`, size, (c, h) => {
+        const pose = { x: h, y: h, r: e.r, facing: 1, walk: (frame / WALK_FRAMES) * cycle, flash: flash ? 1 : 0, state: e.state };
+        if (isRat) drawRat(look(c), pose, 1);
+        else drawChicken(look(c), pose, e.type === 'rooster', 1);
+      });
+      blit(ctx, s, e.x, e.y, scale, e.facing < 0);
+    }
     ctx.globalAlpha = 1;
 
     // Hits-left bar once it has been hit (the boss has its own big bar)

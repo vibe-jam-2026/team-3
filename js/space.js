@@ -2,6 +2,8 @@
 // The still parts are painted once into an offscreen canvas (redone when the window
 // size changes); only a handful of twinkling stars are drawn every frame.
 
+import { dpr as screenScale } from './display.js';
+
 // Two looks: dimension 0 is normal space; dimension 1 is the "other dimension"
 // you reach through a wormhole (greenish sky, different planets).
 const THEMES = [
@@ -179,14 +181,14 @@ function drawRingedPlanet(c, x, y, r, T) {
 
 /** Build a dimension's sky ahead of time (so switching to it doesn't stutter). */
 export function prepareSpace(w, h, dimension) {
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = screenScale();
   const c = caches[dimension];
   if (!c || c.w !== w || c.h !== h || c.dpr !== dpr) caches[dimension] = build(w, h, dpr, THEMES[dimension]);
 }
 
 /** Draw the space background filling w x h. dimension 0 = normal, 1 = the other dimension. */
 export function drawSpace(ctx, w, h, dimension = 0) {
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = screenScale();
   const T = THEMES[dimension] || THEMES[0];
   let cache = caches[dimension];
   if (!cache || cache.w !== w || cache.h !== h || cache.dpr !== dpr) {

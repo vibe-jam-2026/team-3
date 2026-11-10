@@ -7,6 +7,7 @@ import {
 import { drawBigBang, bigBangTime } from './bigbang.js';
 import { prepareSpace } from './space.js';
 import { arcade, pixel } from './fonts.js';
+import { dpr as screenScale } from './display.js';
 import { addScore, loadScores, bestScore, MAX_ENTRIES } from './highscores.js';
 import { DEBUG } from './config.js';
 import { VERSION } from './version.js';
@@ -44,7 +45,7 @@ let height = 0;
 
 // ---------- Canvas sizing (sharp on high-DPI screens) ----------
 function resize() {
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = screenScale();
   width = window.innerWidth;
   height = window.innerHeight;
   canvas.width = Math.round(width * dpr);
@@ -403,20 +404,25 @@ function drawOverlay(title, lines) {
   lines.forEach((line, i) => ctx.fillText(line, cx, cy + 10 + i * 32));
 }
 
-// ---------- Main loop (fixed time step for stable physics) ----------
-const STEP = 1 / 60;
+// ---------- Main loop ----------
+// Every frame advances the game by exactly the time since the last frame, split into
+// equal small steps (at most 1/60 s each) for stable physics. Unlike a fixed 60-steps-
+// per-second clock, this moves smoothly on 90/120/144 Hz screens too: no repeated or
+// doubled frames, which look like stutter.
+const MAX_STEP = 1 / 60;
 let last = performance.now();
-let acc = 0;
 
 function frame(now) {
-  acc += Math.min((now - last) / 1000, 0.25); // cap so a background tab doesn't explode
+  const elapsed = Math.min((now - last) / 1000, 0.1); // cap so a background tab doesn't explode
   last = now;
-  let stepped = false;
-  while (acc >= STEP) {
-    update(STEP);
-    acc -= STEP;
-    // Key presses only count once, even if we run several steps this frame.
-    if (!stepped) { endFrame(); stepped = true; }
+  if (elapsed > 0) {
+    const steps = Math.ceil(elapsed / MAX_STEP - 1e-6);
+    const dt = elapsed / steps;
+    for (let i = 0; i < steps; i++) {
+      update(dt);
+      // Key presses only count once, even if we run several steps this frame.
+      if (i === 0) endFrame();
+    }
   }
   draw();
   requestAnimationFrame(frame);
