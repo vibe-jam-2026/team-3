@@ -123,6 +123,16 @@ Spawn interval by wave (after the 20% boost):
 - Price per level follows Fibonacci, the same for every upgrade: **1, 2, 3, 5, 8, 13, 21, 34, 55, …**
 - The extra **Max All** card is a trap: it makes the next wave a flood of unkillable enemies (one every 0.04 s, up to 300).
 
+## Partner throw
+
+| Stat | Value |
+|---|---|
+| Keys | P1 **Q**, P2 **.** (full stop) |
+| Grab range | heads within 70 px of each other |
+| Throw | random direction (one that lands inside the arena), out to 97% of the max body length |
+| Flight | 0.45 s, thrown head can't be hurt and can't steer |
+| Cooldown | 0.6 s per player |
+
 ## Wormhole
 
 | Stat | Value |

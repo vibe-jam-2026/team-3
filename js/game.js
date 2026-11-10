@@ -2,7 +2,8 @@
 // main.js decides which screen is shown; this file only runs one wave at a time
 // and reports game.status = 'playing' | 'waveComplete' | 'dead'.
 
-import { moveVector } from './input.js';
+import { moveVector, wasPressed } from './input.js';
+import { tryThrow, updateThrown, throwHeight } from './throw.js';
 import { PLAYER, CHAIN, WAVES, DEBUG, RATS, CURSE, BOSS, ALIEN } from './config.js';
 import { createChain, springPlayers, constrainPlayers, updateChain, chainHits } from './chain.js';
 import { drawWormBody, drawWormHead } from './worm.js';
@@ -96,6 +97,8 @@ export function startNextWave(game) {
     p.x = start[i].x;
     p.y = start[i].y;
     p.lookX = p.lookY = undefined; // eyes face outward again, like at the start
+    p.thrown = null;
+    p.throwCd = 0;
   });
   const maxLength = game.chain.maxLength;
   game.chain = createChain(game.players[0], game.players[1]);
@@ -148,7 +151,16 @@ export function updateGame(game, dt) {
   game.waveTime += dt;
 
   // --- Players ---
+  // Throwing: P1 = Q, P2 = "." (only when the two heads are right next to each other)
+  if (wasPressed('KeyQ')) tryThrow(game, 0);
+  if (wasPressed('Period')) tryThrow(game, 1);
   for (const p of game.players) {
+    if (updateThrown(p, dt)) {
+      // In the air: no steering, but the rest still ticks
+      p.invuln = Math.max(0, p.invuln - dt);
+      p.hp = Math.min(p.maxHp, p.hp + game.stats.regen * dt);
+      continue;
+    }
     const dir = moveVector(p.index);
     // Remember which way the worm head is facing (for its eyes)
     if (dir.x || dir.y) { p.lookX = dir.x; p.lookY = dir.y; }
@@ -158,7 +170,8 @@ export function updateGame(game, dt) {
     p.hp = Math.min(p.maxHp, p.hp + game.stats.regen * dt);
   }
   const [a, b] = game.players;
-  springPlayers(a, b, dt, game.chain.maxLength);
+  const flying = a.thrown || b.thrown;
+  if (!flying) springPlayers(a, b, dt, game.chain.maxLength); // let the throw fly out to full length
   constrainPlayers(a, b, game.chain.maxLength);
   for (const p of game.players) clampToArena(game, p);
 
@@ -328,7 +341,25 @@ export function drawGame(ctx, game) {
 }
 
 function drawPlayer(ctx, p, neck) {
-  drawWormHead(ctx, p, neck); // each player is one head of the worm
+  const h = throwHeight(p);
+  if (h > 0) {
+    // Thrown: shadow stays on the ground, the head flies up and back down
+    ctx.fillStyle = `rgba(0, 0, 0, ${0.35 - 0.15 * h})`;
+    ctx.beginPath();
+    ctx.ellipse(p.x, p.y + p.r * 0.8, p.r * (1 - 0.3 * h), p.r * 0.35 * (1 - 0.3 * h), 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.save();
+    const lift = h * 38;
+    const scale = 1 + 0.35 * h;
+    ctx.translate(p.x, p.y - lift);
+    ctx.scale(scale, scale);
+    ctx.rotate((p.thrown ? p.thrown.t : 0) * 14); // tumbling
+    ctx.translate(-p.x, -p.y);
+    drawWormHead(ctx, p, neck);
+    ctx.restore();
+  } else {
+    drawWormHead(ctx, p, neck); // each player is one head of the worm
+  }
 
   // Health bar under the player
   const w = 40;
