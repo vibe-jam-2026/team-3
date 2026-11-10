@@ -336,9 +336,9 @@ function drawTitle() {
 
   ctx.font = '600 18px system-ui, sans-serif';
   ctx.fillStyle = PLAYER_COLORS[0];
-  ctx.fillText('Player 1: W A S D', cx, cy);
+  ctx.fillText('Player 1: W A S D · Q throw', cx, cy);
   ctx.fillStyle = PLAYER_COLORS[1];
-  ctx.fillText('Player 2: Arrow keys', cx, cy + 30);
+  ctx.fillText('Player 2: Arrow keys · . throw', cx, cy + 30);
 
   const blink = Math.floor(performance.now() / 500) % 2 === 0;
   if (blink && t > 1.7) {

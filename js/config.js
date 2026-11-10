@@ -105,6 +105,14 @@ export const DEV_START = {
   coinsFactor: 12,
 };
 
+// Partner throw (see throw.js): P1 = Q, P2 = "." when the heads are next to each other
+export const THROW = {
+  grabDistance: 70,   // px between the two heads to be able to grab
+  distance: 0.97,     // thrown out to this fraction of the body's max length
+  flightTime: 0.45,   // seconds in the air
+  cooldown: 0.6,      // seconds before the same player can throw again
+};
+
 // Wormhole to the other dimension (see wormhole.js)
 export const WORMHOLE = {
   chance: 0.25,     // chance per normal wave that a wormhole opens (never on boss waves)

@@ -4,12 +4,12 @@
 
 const MASTER_VOLUME = 0.5;
 // Don't spam: at most one sound of each kind per this many seconds
-const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1, whoosh: 0.5, beam: 1, fall: 1, boom: 0.5 };
+const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1, whoosh: 0.5, beam: 1, fall: 1, boom: 0.5, toss: 0.2 };
 
 let ctx = null;
 let master = null;
 let muted = false;
-const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity, whoosh: -Infinity, beam: -Infinity, fall: -Infinity, boom: -Infinity };
+const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity, whoosh: -Infinity, beam: -Infinity, fall: -Infinity, boom: -Infinity, toss: -Infinity };
 
 try { muted = localStorage.getItem('tethered-muted') === '1'; } catch { /* storage blocked */ }
 
@@ -82,6 +82,12 @@ export function playMeteorFall(dur) {
 export function playBoom() {
   if (!canPlay('boom')) return;
   boom(ctx, master, ctx.currentTime);
+}
+
+/** A worm head gets thrown: a quick "hup" plus a swoosh. */
+export function playThrow() {
+  if (!canPlay('toss')) return;
+  toss(ctx, master, ctx.currentTime);
 }
 
 /** The worm goes through a wormhole: a swirling whoosh. */
@@ -498,4 +504,32 @@ export function boom(ac, dest, t) {
   ng.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
   n.connect(lp).connect(ng).connect(dest);
   n.start(t);
+}
+
+export function toss(ac, dest, t) {
+  // "Hup!": a short rising grunt
+  const o = ac.createOscillator();
+  o.type = 'triangle';
+  o.frequency.setValueAtTime(220, t);
+  o.frequency.exponentialRampToValueAtTime(440, t + 0.1);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+  o.connect(g).connect(dest);
+  o.start(t); o.stop(t + 0.16);
+  // Swoosh of air
+  const n = noiseSource(ac, 0.45);
+  const bp = ac.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.Q.value = 2;
+  bp.frequency.setValueAtTime(600, t + 0.05);
+  bp.frequency.exponentialRampToValueAtTime(3000, t + 0.25);
+  bp.frequency.exponentialRampToValueAtTime(800, t + 0.45);
+  const ng = ac.createGain();
+  ng.gain.setValueAtTime(0.0001, t + 0.05);
+  ng.gain.exponentialRampToValueAtTime(0.35, t + 0.2);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+  n.connect(bp).connect(ng).connect(dest);
+  n.start(t + 0.05);
 }
