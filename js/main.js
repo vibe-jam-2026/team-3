@@ -5,6 +5,7 @@ import {
   createGame, resizeGame, updateGame, drawGame, startNextWave, formatTime, PLAYER_COLORS,
 } from './game.js';
 import { drawBigBang, bigBangTime } from './bigbang.js';
+import { prepareSpace } from './space.js';
 import { addScore, loadScores, bestScore, MAX_ENTRIES } from './highscores.js';
 import { DEBUG } from './config.js';
 import { VERSION } from './version.js';
@@ -19,6 +20,14 @@ onKeyword((kind) => {
 });
 
 startMusic(); // begins playing as soon as the first key press / click unlocks audio
+
+// Build the other dimension's sky in the background while the title is showing,
+// so a wormhole opening mid-game doesn't stutter.
+setTimeout(() => {
+  const build = () => prepareSpace(window.innerWidth, window.innerHeight, 1);
+  if (window.requestIdleCallback) requestIdleCallback(build, { timeout: 3000 });
+  else build();
+}, 2500);
 import { UPGRADES, upgradeCost, buyUpgrade } from './upgrades.js';
 
 const canvas = document.getElementById('game');
