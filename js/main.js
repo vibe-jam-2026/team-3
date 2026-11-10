@@ -332,7 +332,7 @@ function drawTitle() {
   ctx.shadowBlur = 8;
   ctx.font = '18px system-ui, sans-serif';
   ctx.fillStyle = '#d9cfe8';
-  ctx.fillText('In the beginning there was one worm. With two heads.', cx, cy - 60);
+  ctx.fillText('In the beginning there were two worms. Tied together.', cx, cy - 60);
 
   ctx.font = '600 18px system-ui, sans-serif';
   ctx.fillStyle = PLAYER_COLORS[0];
