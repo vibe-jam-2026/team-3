@@ -9,6 +9,9 @@ import { addScore, loadScores, bestScore, MAX_ENTRIES } from './highscores.js';
 import { DEBUG } from './config.js';
 import { VERSION } from './version.js';
 import { toggleMute, isMuted } from './audio.js';
+import { startMusic, toggleMusic, isMusicOn } from './music.js';
+
+startMusic(); // begins playing as soon as the first key press / click unlocks audio
 import { UPGRADES, upgradeCost, buyUpgrade } from './upgrades.js';
 
 const canvas = document.getElementById('game');
@@ -223,6 +226,7 @@ function update(dt) {
   if (document.activeElement instanceof HTMLInputElement) return;
   // Sound on/off works on every screen
   if (wasPressed('KeyM')) toggleMute();
+  if (wasPressed('KeyN')) toggleMusic();
   switch (screen) {
     case 'title':
       if (wasPressed('Enter') || wasPressed('Space')) startGame();
@@ -339,7 +343,7 @@ function drawTitle() {
 
   ctx.font = '14px system-ui, sans-serif';
   ctx.fillStyle = '#a79fb8';
-  ctx.fillText(`Esc / P: pause · M: sound ${isMuted() ? 'off' : 'on'}`, cx, height - 30);
+  ctx.fillText(`Esc / P: pause · M: sound ${isMuted() ? 'off' : 'on'} · N: music ${isMusicOn() ? 'on' : 'off'}`, cx, height - 30);
   ctx.globalAlpha = 1;
   ctx.shadowBlur = 0;
   ctx.shadowColor = 'transparent';

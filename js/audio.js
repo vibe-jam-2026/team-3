@@ -31,6 +31,11 @@ for (const evt of ['keydown', 'pointerdown']) {
   window.addEventListener(evt, ensureContext, { passive: true });
 }
 
+/** The shared audio context and master volume (null until the first key press / click). */
+export function getAudio() {
+  return ctx && ctx.state === 'running' ? { ctx, master } : null;
+}
+
 export function isMuted() {
   return muted;
 }
