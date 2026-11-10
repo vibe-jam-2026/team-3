@@ -6,6 +6,7 @@
 
 import { WORMHOLE, DEBUG } from './config.js';
 import { playWhoosh } from './audio.js';
+import { prepareSpace } from './space.js';
 
 /** Decide at the start of a wave whether (and when) a wormhole opens. */
 export function rollWormhole(game, isBossWave) {
@@ -31,6 +32,8 @@ function placeWormhole(game) {
     if (d > 180) break;
   }
   game.wormhole = { x: best.x, y: best.y, r: WORMHOLE.radius, age: 0, life: WORMHOLE.duration };
+  // Get the sky on the other side ready now, while the wormhole is opening
+  setTimeout(() => prepareSpace(game.width, game.height, game.dimension === 1 ? 0 : 1), 0);
 }
 
 export function updateWormhole(game, dt) {
