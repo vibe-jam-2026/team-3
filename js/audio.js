@@ -236,7 +236,7 @@ export function pew(ac, dest, t) {
 export function squeak(ac, dest, t) {
   // 2-3 tiny chirps: a high sine that bends up then down, with a fast vibrato
   const n = 2 + (Math.random() < 0.4 ? 1 : 0);
-  const base = 2600 + Math.random() * 700;
+  const base = (2600 + Math.random() * 700) * 1.2; // 20% higher than the first version
   for (let i = 0; i < n; i++) {
     const st = t + i * 0.09;
     const dur = 0.06 + Math.random() * 0.03;

@@ -10,9 +10,7 @@
 
 All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
-Images and videos: **[media/](media/README.md)** (with a guide to uploading them)
-
-Current version: **1.03** (shown in the bottom-right corner of the game)
+Current version: **1.04** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
