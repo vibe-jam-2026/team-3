@@ -4,12 +4,12 @@
 
 const MASTER_VOLUME = 0.5;
 // Don't spam: at most one sound of each kind per this many seconds
-const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1, whoosh: 0.5, beam: 1, fall: 1, boom: 0.5, toss: 0.2, weee: 0.3 };
+const MIN_GAP = { cluck: 0.18, crow: 1.2, roar: 2, pew: 0.05, squeak: 0.4, meow: 1, whoosh: 0.5, beam: 1, fall: 1, boom: 0.5, toss: 0.2, weee: 0.3, stampede: 1 };
 
 let ctx = null;
 let master = null;
 let muted = false;
-const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity, whoosh: -Infinity, beam: -Infinity, fall: -Infinity, boom: -Infinity, toss: -Infinity, weee: -Infinity };
+const lastPlayed = { cluck: -Infinity, crow: -Infinity, roar: -Infinity, pew: -Infinity, squeak: -Infinity, meow: -Infinity, whoosh: -Infinity, beam: -Infinity, fall: -Infinity, boom: -Infinity, toss: -Infinity, weee: -Infinity, stampede: -Infinity };
 
 try { muted = localStorage.getItem('tethered-muted') === '1'; } catch { /* storage blocked */ }
 
@@ -94,6 +94,14 @@ export function playWeee(dur) {
 export function playThrow() {
   if (!canPlay('toss')) return;
   toss(ctx, master, ctx.currentTime);
+}
+
+/** Cat stampede: a chorus of meows over galloping paws. */
+export function playStampede() {
+  if (!canPlay('stampede')) return;
+  const t = ctx.currentTime;
+  for (let i = 0; i < 6; i++) meow(ctx, master, t + i * 0.18 + Math.random() * 0.08);
+  for (let i = 0; i < 26; i++) paw(ctx, master, t + i * 0.07 + Math.random() * 0.03);
 }
 
 /** The worm goes through a wormhole: a swirling whoosh. */
@@ -574,4 +582,16 @@ export function weee(ac, dest, t, dur) {
   env.connect(dest);
   o.start(t); o.stop(t + len + 0.05);
   vib.start(t); vib.stop(t + len + 0.05);
+}
+
+function paw(ac, dest, t) {
+  // One soft thump of a paw
+  const o = ac.createOscillator();
+  o.frequency.setValueAtTime(120 + Math.random() * 40, t);
+  o.frequency.exponentialRampToValueAtTime(50, t + 0.08);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.25, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+  o.connect(g).connect(dest);
+  o.start(t); o.stop(t + 0.11);
 }

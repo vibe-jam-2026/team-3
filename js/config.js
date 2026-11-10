@@ -113,6 +113,16 @@ export const THROW = {
   cooldown: 0.6,      // seconds before the same player can throw again
 };
 
+// Yarn ball drop (see yarn.js): touching it sends a cat stampede across the screen
+export const YARN = {
+  dropChance: 0.01,  // chance per kill (1%)
+  radius: 11,
+  lifetime: 15,      // seconds before it rolls away (blinks in the last 3 s)
+  cats: 10,          // cats in the stampede, one per lane, covering the whole height
+  catSpeed: 900,     // px/s
+  bossHits: 2,       // hits a boss loses from the stampede (other enemies just die)
+};
+
 // Wormhole to the other dimension (see wormhole.js)
 export const WORMHOLE = {
   chance: 0.25,     // chance per normal wave that a wormhole opens (never on boss waves)
@@ -175,11 +185,13 @@ export const COINS = {
 //   ?start=4      begin at wave 4 (to test later waves and enemy tiers)
 //   ?coins=200    start with 200 coins (to test upgrades)
 //   ?wormhole     a wormhole opens 2 s into every normal wave
+//   ?yarn         yarn balls drop from 25% of kills instead of 1%
 const params = new URLSearchParams(window.location.search);
 export const DEBUG = {
   god: params.has('god'),
   startWave: Math.max(1, Math.floor(Number(params.get('start')) || 1)),
   startCoins: Math.max(0, Math.floor(Number(params.get('coins')) || 0)),
   wormhole: params.has('wormhole'),
+  yarn: params.has('yarn'),
 };
 if (params.has('wave')) WAVES.duration = Number(params.get('wave')) || WAVES.duration;

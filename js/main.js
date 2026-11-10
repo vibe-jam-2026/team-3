@@ -149,7 +149,7 @@ const scoreNote = document.getElementById('score-note');
 const playAgainBtn = document.getElementById('play-again-btn');
 
 // Test runs (god mode, dev starts, extra coins, short waves) don't go on the list
-const isTestRun = DEBUG.god || DEBUG.wormhole || DEBUG.startWave > 1 || DEBUG.startCoins > 0 ||
+const isTestRun = DEBUG.god || DEBUG.wormhole || DEBUG.yarn || DEBUG.startWave > 1 || DEBUG.startCoins > 0 ||
   new URLSearchParams(window.location.search).has('wave');
 
 function wavesCleared() {

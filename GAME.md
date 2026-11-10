@@ -12,7 +12,7 @@ All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
 Images and videos: **[media/](media/README.md)** (with a guide to uploading them)
 
-Current version: **1.15** (shown in the bottom-right corner of the game)
+Current version: **1.16** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 
@@ -49,6 +49,7 @@ the players survive by moving, and by using the chain itself as a weapon.
 | Rats | Neutral critters (from wave 1, max 4 at once). They never hurt the players. They run to the nearest egg, crack it in one bite and sit eating it for 2.5 s. Eggs eaten by rats give no kills or coins. The chain kills rats (1 coin) |
 | Partner throw | When the two worm heads are right next to each other (within 70 px), P1 can press **Q** or P2 **.** (full stop) to grab the other head and **throw it in a random direction** out to the full body length. The thrown head tumbles through the air (can't be hurt while flying), and the body whips along behind it, hitting enemies on the way. The flying head shouts *"weeee!"* |
 | Coins | Killed enemies drop coins on the spot (on average in wave 1: egg 0.8, chicken 2.4, rooster 4.8, boss 20; **×1.2 more every wave**). After 1 s they can be collected: by touching a player, by touching the **chain**, or by being pulled in by each player's small **magnet field**. The team shares one wallet. Coins still on the floor when the wave ends are lost |
+| Yarn ball | Every kill has a **1% chance** to drop a glowing **ball of yarn** (it stays 15 s, blinking at the end). Touch it with a head or the body and **10 cats stampede across the screen** in lanes covering the whole arena, flattening every enemy (rats too). Bosses lose 2 hits |
 | Upgrades | Bought between waves in the shop (click or keys 1–7), shared by both players: **Chain length** (+30 px), **Max health** (+25), **Health regen** (+1 hp/s), **Move speed** (+8%), **Enemy slow** (−7% enemy speed), **Coin magnet** (+35 px field), **Rat health** (rats take +1 hit to kill). No level cap; prices follow Fibonacci: 1, 2, 3, 5, 8, 13, 21, ... |
 | Highscores | After game over both players enter a **3-character name** each; the run goes on a **top-10 list** ranked by **highest wave cleared** (then kills, then time). The best run is shown on the title screen. Saved in the browser (localStorage), so the list belongs to the computer you play on. Test runs with debug options aren't saved |
 | Wormhole | In each normal (non-boss) wave there's a **25% chance** a swirling **wormhole** opens 5–15 s in and stays for 10 s. If a worm head touches it, the worm goes to the **other dimension**: a greenish sky with different planets, and enemies in different colours. The enemies left behind stay behind. The worm stays there until another wormhole takes it back |
