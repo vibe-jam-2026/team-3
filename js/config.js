@@ -114,7 +114,7 @@ export const WORMHOLE = {
   radius: 34,       // px
 };
 
-// Voice-activated powers (see powers.js). Keyboard fallback: B = beam, K = meteor.
+// Voice-activated powers (see powers.js). Voice only: shout BEAM or METEOR.
 export const POWERS = {
   beamDuration: 2.5,    // seconds both heads fire
   beamWidth: 70,        // px
@@ -124,13 +124,22 @@ export const POWERS = {
   meteorBossHits: 2,    // hits a boss loses from a meteor (other enemies just die)
 };
 
-// Voice control (see voice.js). V turns the microphone on/off.
+// Voice control (see voice.js). Starts with the first key press; V turns it off/on.
+// The powers can only be triggered by voice. Matching is forgiving, because speech
+// recognition often mishears short shouted words.
 export const VOICE = {
   lang: 'en-US',
-  // Any of these words (lower case) triggers the power
   keywords: {
-    beam: ['beam', 'laser', 'beem', 'been'],
-    meteor: ['meteor', 'meteorite', 'meteors', 'media'],
+    beam: {
+      target: 'beam', maxDistance: 1, // also "bean", "team", "seem", "been" ...
+      words: ['laser', 'lazer', 'beams', 'beaming', 'bim', 'dream'],
+      prefixes: ['beam', 'laser'],
+    },
+    meteor: {
+      target: 'meteor', maxDistance: 2, // also "meter", "meteo", "metior" ...
+      words: ['media', 'medio', 'metro', 'meetyour', 'meetya', 'meteorite', 'meteors'],
+      prefixes: ['meteo', 'metio', 'medior'],
+    },
   },
 };
 
