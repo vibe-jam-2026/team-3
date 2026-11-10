@@ -1,5 +1,7 @@
 # Team 3 game jam: notes for Claude
 
+The game is called **Wormageddon in Space**. Text uses arcade fonts from `js/fonts.js` (Press Start 2P for titles/HUD/buttons, VT323 for longer text); use those for new on-screen text.
+
 - Browser game, plain HTML + JavaScript modules + one canvas, no build step. Published from `main` by GitHub Pages.
 - `GAME.md` is the game concept; keep its rules table in sync with gameplay changes.
 - `STATS.md` lists every base value (players, chain, enemies, boss, waves, upgrades, debug options).

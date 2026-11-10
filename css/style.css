@@ -154,3 +154,38 @@ canvas {
 .scores .wave { font-weight: 700; color: #ffd54f; }
 .scores .extra { color: #8a8578; font-size: 13px; }
 .scores .empty { color: #8a8578; text-align: center; display: block; }
+
+/* ---------- Arcade look for the menus (shop, game over, highscores) ---------- */
+.menu { font-family: "VT323", "Courier New", monospace; font-size: 20px; }
+.panel h1, .panel h2, .panel button, .wallet, .names label, .names input, .names .amp,
+.upgrade .name, .upgrade .cost, .scores .who, .scores .wave, .scores .rank {
+  font-family: "Press Start 2P", "Courier New", monospace;
+  font-weight: normal;
+  letter-spacing: 0;
+}
+.panel h1 { font-size: 22px; line-height: 1.4; color: #ffd54f; text-shadow: 3px 3px 0 #2a0838; text-transform: uppercase; }
+.panel h2 { font-size: 14px; color: #4fc3f7; text-shadow: 2px 2px 0 #0b1640; text-transform: uppercase; }
+.panel p, .panel .hint, .hint-top { font-family: "VT323", "Courier New", monospace; font-size: 22px; line-height: 1.15; }
+.panel .hint { font-size: 18px; }
+.panel button.continue, #play-again-btn, #save-score-btn {
+  font-size: 14px;
+  padding: 14px 28px;
+  border-radius: 4px;
+  box-shadow: 0 4px 0 #1b6f99;
+  text-transform: uppercase;
+}
+.panel button.continue:active { transform: translateY(3px); box-shadow: 0 1px 0 #1b6f99; }
+.wallet { font-size: 16px; }
+.panel button.upgrade { border-radius: 4px; }
+.upgrade .name { font-size: 9px; line-height: 1.5; }
+.upgrade .desc { font-family: "VT323", "Courier New", monospace; font-size: 17px; line-height: 1.05; }
+.upgrade .pips { font-family: "VT323", "Courier New", monospace; font-size: 16px; letter-spacing: 1px; }
+.upgrade .cost { font-size: 10px; }
+.upgrade .sneaky { font-family: "Press Start 2P", "Courier New", monospace; font-size: 8px; }
+.names label { font-size: 10px; }
+.names input { font-size: 24px; letter-spacing: 6px; border-radius: 4px; }
+.names .amp { font-size: 16px; }
+.panel button.link { font-family: "VT323", "Courier New", monospace; font-size: 20px; box-shadow: none; }
+.scores { font-family: "VT323", "Courier New", monospace; font-size: 20px; }
+.scores .rank, .scores .who, .scores .wave { font-size: 11px; }
+.scores .extra { font-size: 18px; }

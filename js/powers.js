@@ -9,6 +9,7 @@
 import { POWERS } from './config.js';
 import { hitBoss } from './boss.js';
 import { playBeam, playMeteorFall, playBoom } from './audio.js';
+import { arcade, pixel } from './fonts.js';
 
 export function createPowers() {
   // fx: meteor particles (embers, smoke, debris) · rings: shockwaves · boom: impact text timer
@@ -348,7 +349,7 @@ export function drawMeteor(ctx, game) {
     ctx.save();
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '900 46px system-ui, sans-serif';
+    ctx.font = arcade(30);
     ctx.shadowColor = 'rgba(255, 60, 0, 0.9)';
     ctx.shadowBlur = 20;
     ctx.fillStyle = Math.floor(t * 8) % 2 ? '#ffffff' : '#ffcc80';
@@ -479,7 +480,7 @@ export function drawMeteor(ctx, game) {
     ctx.globalAlpha = Math.min(1, P.boom * 2.5);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '900 84px system-ui, sans-serif';
+    ctx.font = arcade(56);
     ctx.lineJoin = 'round';
     ctx.strokeStyle = '#3a0d00';
     ctx.lineWidth = 12;

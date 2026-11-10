@@ -25,6 +25,7 @@ import { updateProjectiles, drawProjectiles } from './projectiles.js';
 import { applyDevStartUpgrades } from './upgrades.js';
 import { dropCoins, updateCoins, drawCoins, drawCoinIcon, drawMagnetFields } from './coins.js';
 import { createUpgradeLevels, applyStats } from './upgrades.js';
+import { arcade, pixel } from './fonts.js';
 
 export const PLAYER_COLORS = ['#4fc3f7', '#ffb74d'];
 
@@ -385,21 +386,21 @@ function drawHud(ctx, game) {
   ctx.fillStyle = '#e8e6e1';
 
   ctx.textAlign = 'center';
-  ctx.font = '600 18px system-ui, sans-serif';
+  ctx.font = arcade(13);
   ctx.fillText(`Wave ${game.wave}`, game.width / 2, 14);
-  ctx.font = '700 28px system-ui, sans-serif';
+  ctx.font = arcade(22);
   if (waveTimeLeft(game) > 0) {
     ctx.fillText(String(Math.ceil(waveTimeLeft(game))), game.width / 2, 36);
   } else if (bossWaveUnfinished(game)) {
     // Overtime: the boss wave only ends when the boss is dead
     ctx.fillStyle = '#ff8a80';
-    ctx.font = '700 22px system-ui, sans-serif';
+    ctx.font = arcade(13);
     ctx.fillText('Kill the boss!', game.width / 2, 38);
     ctx.fillStyle = '#e8e6e1';
   }
 
   ctx.textAlign = 'left';
-  ctx.font = '600 16px system-ui, sans-serif';
+  ctx.font = arcade(11);
   ctx.fillText(`Kills: ${game.kills}`, 18, 16);
   drawCoinIcon(ctx, 26, 50, 7);
   ctx.fillStyle = '#ffd54f';
@@ -413,12 +414,12 @@ function drawHud(ctx, game) {
   if (DEBUG.god) {
     // Reminder that this is a test run
     ctx.fillStyle = '#ffd54f';
-    ctx.font = '700 13px system-ui, sans-serif';
+    ctx.font = arcade(9);
     ctx.fillText('GOD MODE', game.width - 18, 40);
   }
   if (game.dimension === 1) {
     ctx.fillStyle = '#7dffb8';
-    ctx.font = '700 13px system-ui, sans-serif';
+    ctx.font = arcade(9);
     ctx.textAlign = 'left';
     ctx.fillText('OTHER DIMENSION', 18, 70);
   }
@@ -441,7 +442,7 @@ function drawPowersHud(ctx, game) {
   let y = game.height - 18;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'bottom';
-  ctx.font = '600 13px system-ui, sans-serif';
+  ctx.font = arcade(8);
 
   const pill = (label, cd, total, word) => {
     const ready = cd <= 0;
@@ -473,7 +474,7 @@ function drawPowersHud(ctx, game) {
   const now = performance.now();
   if (v.status === 'on' && v.lastHeard && now - v.lastHeardAt < 3000) {
     ctx.fillStyle = 'rgba(232, 230, 225, 0.65)';
-    ctx.font = 'italic 12px system-ui, sans-serif';
+    ctx.font = pixel(18);
     const hit = v.lastMatch && now - v.lastMatchAt < 1500 ? `  → ${v.lastMatch.toUpperCase()}!` : '';
     ctx.fillText(`heard: "${v.lastHeard.slice(-40)}"${hit}`, x, y - 17);
   }

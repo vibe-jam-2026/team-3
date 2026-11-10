@@ -1,4 +1,6 @@
-# Game concept (working title: "Tethered")
+# Wormageddon in Space
+
+*(game concept; working title was "Tethered")*
 
 **▶ Play it: https://vibe-jam-2026.github.io/team-3/**
 
@@ -12,7 +14,7 @@ All numbers (hp, damage, speeds, costs …): **[STATS.md](STATS.md)**
 
 Images and videos: **[media/](media/README.md)** (with a guide to uploading them)
 
-Current version: **1.16** (shown in the bottom-right corner of the game)
+Current version: **1.17** (shown in the bottom-right corner of the game)
 
 > Placeholder title. Art, setting, what the players and enemies *are* — all decided later.
 

@@ -1,4 +1,4 @@
-# Tethered: stats
+# Wormageddon in Space: stats
 
 All base values in the game. The real numbers live in `js/config.js` (and upgrade amounts in `js/upgrades.js`); this page mirrors them and is updated whenever they change.
 
